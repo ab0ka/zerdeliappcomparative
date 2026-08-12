@@ -287,6 +287,8 @@
     .yes { color: var(--brand); font-weight: 800; }
     .no { color: var(--rival-2); }
     .wrapcell { white-space: normal; min-width: 180px; }
+    table.profiles td { padding-top: 12px; padding-bottom: 12px; vertical-align: top; }
+    table.profiles td.wrapcell { min-width: 150px; max-width: 230px; }
     #featureTable th, #featureTable td { padding-left: 7px; padding-right: 7px; }
     #featureTable th { font-size: 10px; letter-spacing: .04em; }
 
@@ -406,48 +408,29 @@
     </section>
 
     <main>
-      <!-- ШАГ 1. ЦЕНА -->
+      <!-- ШАГ 1. ЧТО ЭТО ЗА ПРОДУКТЫ -->
       <div class="sec-head">
-        <div class="sec-kicker">Шаг 1 · Цена</div>
-        <h2>Сколько стоит месяц занятий</h2>
-        <div class="sec-note">Все тарифы приведены к одному месяцу. Компании сгруппированы по типу продукта, у каждой взят самый дешёвый тариф.</div>
+        <div class="sec-kicker">Шаг 1 · Суть продуктов</div>
+        <h2>Чем эти продукты отличаются друг от друга</h2>
+        <div class="sec-note">Сравнивать их только по цене нельзя: это три разных типа. Приложение для самостоятельной учёбы, банк тестов и курс с живым преподавателем решают разные задачи и стоят по-разному не потому, что кто-то жадный.</div>
       </div>
-      <section class="kpis" id="kpiGrid"></section>
-      <article class="card" style="margin-top:14px">
-        <div class="chart-box" id="mapBox"><canvas id="mapChart"></canvas></div>
-      </article>
-      <article class="card" style="margin-top:14px">
-        <div class="card-head">
-          <h3 class="card-title">Ценовые коридоры категорий</h3>
-          <div class="card-sub">Полоса — от самого дешёвого до самого дорогого тарифа категории, точка — медиана</div>
-        </div>
-        <div class="chart-box sm"><canvas id="rangeChart"></canvas></div>
-      </article>
+      <div id="profilesBox"></div>
 
-      <!-- ШАГ 2. НАПОЛНЕНИЕ -->
+      <!-- ШАГ 2. НАПОЛНЕНИЕ И ФУНКЦИИ -->
       <div class="sec-head">
         <div class="sec-kicker">Шаг 2 · Наполнение</div>
-        <h2>Что ученик получает за эти деньги</h2>
+        <h2>Что ученик получает внутри</h2>
         <div class="sec-note" id="qualityNote">Объём материала и набор функций — у тех компаний, которые публикуют данные.</div>
       </div>
       <div id="qualityTiles"></div>
       <div id="tasksCard"></div>
-      <div class="grid-2 wide-right">
-        <article class="card">
-          <div class="card-head">
-            <h3 class="card-title">Столько же функций — другая цена</h3>
-            <div class="card-sub" id="sameSub">Компании, у которых функций не меньше, чем у Зерделі</div>
-          </div>
-          <div class="chart-box" id="sameBox"><canvas id="sameChart"></canvas></div>
-        </article>
-        <article class="card">
-          <div class="card-head">
-            <h3 class="card-title">Матрица функций</h3>
-            <div class="card-sub">По самому полному тарифу компании; строка Зерделі закреплена сверху</div>
-          </div>
-          <div class="table-wrap"><table id="featureTable"></table></div>
-        </article>
-      </div>
+      <article class="card" style="margin-top:14px">
+        <div class="card-head">
+          <h3 class="card-title">Матрица функций</h3>
+          <div class="card-sub">По самому полному тарифу компании; строка Зерделі закреплена сверху</div>
+        </div>
+        <div class="table-wrap"><table id="featureTable"></table></div>
+      </article>
 
       <!-- ШАГ 3. ОЦЕНКИ -->
       <div class="sec-head">
@@ -457,17 +440,44 @@
       </div>
       <div id="ratingCards"></div>
 
-      <!-- ШАГ 4. ОХВАТ -->
+      <!-- ШАГ 4. ЦЕНА -->
       <div class="sec-head">
-        <div class="sec-kicker">Шаг 4 · Узнаваемость</div>
+        <div class="sec-kicker">Шаг 4 · Цена</div>
+        <h2>Сколько стоит месяц занятий</h2>
+        <div class="sec-note">Все тарифы приведены к одному месяцу. Компании сгруппированы по типу продукта — сравнивать цену имеет смысл внутри группы, а не между ними.</div>
+      </div>
+      <section class="kpis" id="kpiGrid"></section>
+      <article class="card" style="margin-top:14px">
+        <div class="chart-box" id="mapBox"><canvas id="mapChart"></canvas></div>
+      </article>
+      <div class="grid-2 wide-right" style="margin-top:14px">
+        <article class="card">
+          <div class="card-head">
+            <h3 class="card-title">Ценовые коридоры категорий</h3>
+            <div class="card-sub">Полоса — от самого дешёвого до самого дорогого тарифа, точка — медиана</div>
+          </div>
+          <div class="chart-box sm"><canvas id="rangeChart"></canvas></div>
+        </article>
+        <article class="card">
+          <div class="card-head">
+            <h3 class="card-title">Столько же функций — другая цена</h3>
+            <div class="card-sub" id="sameSub">Компании, у которых функций не меньше, чем у Зерделі</div>
+          </div>
+          <div class="chart-box" id="sameBox"><canvas id="sameChart"></canvas></div>
+        </article>
+      </div>
+
+      <!-- ШАГ 5. ОХВАТ -->
+      <div class="sec-head">
+        <div class="sec-kicker">Шаг 5 · Узнаваемость</div>
         <h2>Кто вышел раньше и кого больше знают</h2>
         <div class="sec-note">Возраст продукта во многом объясняет разрыв в аудитории: подписчики и установки копятся годами.</div>
       </div>
       <div id="reachCards"></div>
 
-      <!-- ШАГ 5. ОДИН НА ОДИН -->
+      <!-- ШАГ 6. ОДИН НА ОДИН -->
       <div class="sec-head">
-        <div class="sec-kicker">Шаг 5 · Прямое сравнение</div>
+        <div class="sec-kicker">Шаг 6 · Прямое сравнение</div>
         <h2>Зерделі против каждого конкурента</h2>
         <div class="sec-note">По одной строке на компанию, взят её самый дешёвый тариф. Верхняя полоса — Зерделі, нижняя — конкурент.</div>
       </div>
@@ -476,9 +486,9 @@
         <button class="btn more-btn" id="moreRivals" type="button" hidden></button>
       </article>
 
-      <!-- ШАГ 6. ДЕТАЛИ -->
+      <!-- ШАГ 7. ДЕТАЛИ -->
       <div class="sec-head">
-        <div class="sec-kicker">Шаг 6 · Данные</div>
+        <div class="sec-kicker">Шаг 7 · Данные</div>
         <h2>Всё в одной таблице</h2>
         <div class="sec-note">Здесь собраны цифры из предыдущих шагов, чтобы можно было проверить любую из них.</div>
       </div>
@@ -922,6 +932,7 @@
     /* ---------------- render ---------------- */
     function render() {
       renderVerdict();
+      renderProfiles();
       renderKpis();
       renderPriceMap();
       renderRangeChart();
@@ -930,6 +941,113 @@
       renderQuality();
       renderSameFeatures();
       renderTable();
+    }
+
+    /* Профили продуктов: чем они отличаются по сути, а не по цене.
+       Всё берётся из данных — формат, классы, предметы, поддержка, мотивация. */
+    /* Поле Format в таблице заполнено по-английски — переводим только известные
+       обороты, всё незнакомое оставляем как есть, чтобы ничего не выдумать. */
+    const FORMAT_RU = [
+      ["App/web", "приложение и веб"],
+      ["video lessons", "видеоуроки"],
+      ["Videos", "видео"],
+      ["video", "видео"],
+      ["tests", "тесты"],
+      ["gamification", "геймификация"],
+      ["AI trainer", "ИИ-тренажёр"],
+      ["mentor chat", "чат с ментором"],
+      ["live lessons", "живые уроки"],
+      ["curator", "куратор"],
+      ["Zoom practice", "практика в Zoom"],
+      ["Online tests", "онлайн-тесты"],
+      ["notes", "конспекты"],
+      ["Adaptive practice", "адаптивная практика"],
+      ["analytics", "аналитика"],
+      ["parent tools", "отчёты родителям"],
+      ["Freemium game", "бесплатная игра"],
+      ["Interactive lessons", "интерактивные уроки"],
+      ["Self-paced online math", "математика в своём темпе"],
+      ["Games", "игры"],
+      ["worksheets", "рабочие листы"],
+      ["rewards", "награды"],
+      ["Practice", "практика"],
+      ["practice", "практика"],
+      ["mastery", "отработка до результата"],
+      ["competitions", "соревнования"],
+      ["Unlimited trial tests", "безлимитные пробные тесты"],
+      ["Online course", "онлайн-курс"],
+      ["live elements", "элементы живых занятий"],
+      ["Timed online competition", "онлайн-соревнование на время"],
+      ["Interactive lessons", "интерактивные уроки"],
+      ["Mobile app subscription", "подписка в мобильном приложении"],
+      ["E-textbook platform", "платформа электронных учебников"],
+      ["Online lessons", "онлайн-занятия"],
+      ["Recordings", "записи занятий"],
+      ["homework", "домашние задания"],
+      ["diagnostics", "диагностика"],
+      ["platform access", "доступ к платформе"],
+      ["cashback", "кэшбэк"],
+      ["mentor", "ментор"],
+    ];
+    function formatRu(text) {
+      let out = String(text || "");
+      FORMAT_RU.forEach(([en, ru]) => { out = out.split(en).join(ru); });
+      return out.replace(/\s*;\s*/g, ", ").replace(/\s*\+\s*/g, " + ");
+    }
+
+    function renderProfiles() {
+      const box = $("#profilesBox");
+      if (!box) return;
+      const q = state.quality;
+      const qOf = (name) => (q ? q.get(lower(name)) : null);
+      const zRow = state.z.minRow;
+
+      const order = [state.z.type].concat(TYPE_ORDER.filter((t) => t !== state.z.type));
+      const rivals = cheapestRows(state.rivals);
+      const rows = (zRow ? [zRow] : []).concat(
+        rivals.sort((x, y) => {
+          const a = order.indexOf(x.type), b = order.indexOf(y.type);
+          if (a !== b) return a - b;
+          const ak = isKz(x.region) ? 0 : 1, bk = isKz(y.region) ? 0 : 1;
+          if (ak !== bk) return ak - bk;
+          return x.company.localeCompare(y.company, "ru");
+        })
+      );
+      if (!rows.length) { box.innerHTML = '<div class="card empty">Нет данных</div>'; return; }
+
+      const support = (r) => {
+        if (r.liveTeacher && r.mentorAi) return "живой преподаватель и куратор";
+        if (r.liveTeacher) return "живой преподаватель";
+        if (r.mentorAi) return "наставник или ИИ-чат";
+        return "никто, только сам";
+      };
+      const motivation = (r) => {
+        const out = [];
+        if (r.gamification) out.push("геймификация");
+        const qq = qOf(r.company);
+        if (qq) qq.extras.filter((e) => /коин|монет|кэшбэк|алмаз|приз|лиг|дуэл/i.test(e)).forEach((e) => out.push(lower(e)));
+        return out.length ? out.join(", ") : "нет";
+      };
+      const language = (r) => {
+        const qq = qOf(r.company);
+        return qq && qq.languages ? qq.languages : "—";
+      };
+
+      box.innerHTML = '<article class="card"><div class="table-wrap"><table class="profiles">' +
+        "<thead><tr><th>Компания</th><th>Тип продукта</th><th>Как учит</th><th>Классы</th><th>Предметы и экзамены</th>" +
+        "<th>Кто помогает ученику</th><th>Чем мотивирует</th><th>Язык</th></tr></thead><tbody>" +
+        rows.map((r) => (
+          "<tr" + (r.isZ ? ' class="me"' : "") + ">" +
+          "<td><b>" + esc(r.company) + "</b></td>" +
+          "<td>" + esc(r.type) + "</td>" +
+          '<td class="wrapcell">' + esc(formatRu(r.format) || "—") + "</td>" +
+          "<td>" + esc(r.grades || "—") + "</td>" +
+          '<td class="wrapcell">' + esc((r.subjects || "—").replace(/;\s*/g, ", ")) + "</td>" +
+          '<td class="' + (r.liveTeacher || r.mentorAi ? "" : "no") + '">' + esc(support(r)) + "</td>" +
+          '<td class="wrapcell">' + esc(motivation(r)) + "</td>" +
+          "<td>" + esc(language(r)) + "</td>" +
+          "</tr>"
+        )).join("") + "</tbody></table></div></article>";
     }
 
     function directRival() {
@@ -1879,10 +1997,10 @@
       const rows = (zRow ? [zRow] : []).concat(companyRows(state.rivals).sort((a, b) => a.company.localeCompare(b.company, "ru")));
       const table = '<article class="card"><div class="card-head"><h3 class="card-title">Что известно сейчас</h3>' +
         '<div class="card-sub">Формат, охват классов и предметы — из листа Raw_Prices</div></div>' +
-        '<div class="table-wrap"><table><thead><tr><th>Компания</th><th>Формат</th><th>Классы</th><th>Предметы</th></tr></thead><tbody>' +
+        '<div class="table-wrap"><table><thead><tr><th>Компания</th><th>Формат</th><th>Классы</th><th>Предметы и экзамены</th></tr></thead><tbody>' +
         rows.map((r) => (
           "<tr" + (r.isZ ? ' class="me"' : "") + "><td>" + esc(r.company) + "</td>" +
-          '<td class="wrapcell">' + esc(r.format || "—") + "</td>" +
+          '<td class="wrapcell">' + esc(formatRu(r.format) || "—") + "</td>" +
           "<td>" + esc(r.grades || "—") + "</td>" +
           '<td class="wrapcell">' + esc(r.subjects || "—") + "</td></tr>"
         )).join("") + "</tbody></table></div></article>";
