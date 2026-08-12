@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>Зерделі vs рынок — сравнительный анализ</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script>document.documentElement.dataset.theme = localStorage.getItem("zerdeli-vs-market-theme") || "light";</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      color-scheme: light;
+      --paper: #f2efe9;
+      --card: #ffffff;
+      --card-2: #faf8f4;
+      --ink: #171233;
+      --soft: #6d6885;
+      --line: #e2dcd1;
+      --line-2: #cfc7b8;
+      --brand: #6a4df6;
+      --brand-2: #8f7bff;
+      --brand-ink: #ffffff;
+      --brand-soft: #ece7ff;
+      --rival: #8d8899;
+      --rival-2: #b6b2c0;
+      --rival-soft: #eeecf1;
+      --hot: #d94f37;
+      --hot-soft: #fbe8e3;
+      --good: #0f8a5f;
+      --good-soft: #e0f2ea;
+      --gold: #b57d00;
+      --gold-soft: #f8eed6;
+      --grid: rgba(23, 18, 51, .09);
+      --shadow: 3px 3px 0 rgba(23, 18, 51, .05);
+      --shadow-lg: 5px 5px 0 rgba(23, 18, 51, .06);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --paper: #0e0d16;
+      --card: #171524;
+      --card-2: #1e1b2e;
+      --ink: #f1effa;
+      --soft: #9b96b4;
+      --line: #2c2740;
+      --line-2: #3a3457;
+      --brand: #b09bff;
+      --brand-2: #c9b9ff;
+      --brand-ink: #14102b;
+      --brand-soft: rgba(155, 131, 255, .17);
+      --rival: #837e9c;
+      --rival-2: #5d5878;
+      --rival-soft: rgba(255, 255, 255, .06);
+      --hot: #ff8365;
+      --hot-soft: rgba(255, 131, 101, .16);
+      --good: #3ed19b;
+      --good-soft: rgba(62, 209, 155, .16);
+      --gold: #f0b429;
+      --gold-soft: rgba(240, 180, 41, .16);
+      --grid: rgba(241, 239, 250, .09);
+      --shadow: 3px 3px 0 rgba(0, 0, 0, .35);
+      --shadow-lg: 5px 5px 0 rgba(0, 0, 0, .4);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .num { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+    button, select, input { font: inherit; color: inherit; }
+    a { color: inherit; }
+    .shell { max-width: 1380px; margin: 0 auto; padding: 20px 24px 64px; }
+
+    /* ---------- header ---------- */
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
+    .brand-mark {
+      width: 44px; height: 44px; flex: 0 0 auto;
+      display: grid; place-items: center;
+      border-radius: 13px;
+      background: var(--brand); color: var(--brand-ink);
+      font-weight: 800; font-size: 20px;
+      box-shadow: 3px 3px 0 var(--brand-soft);
+    }
+    h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
+    .brand-sub { margin-top: 3px; color: var(--soft); font-size: 12.5px; }
+    .top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      height: 36px; min-width: 36px; padding: 0 12px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      border: 1px solid var(--line-2); border-radius: 10px;
+      background: var(--card); font-size: 12.5px; font-weight: 600;
+      cursor: pointer; transition: 140ms ease;
+    }
+    .btn:hover { border-color: var(--brand); color: var(--brand); }
+    .btn.icon { padding: 0; }
+    .btn:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      height: 32px; padding: 0 11px; border-radius: 999px;
+      border: 1px solid var(--line-2); background: var(--card);
+      font-size: 12px; font-weight: 600; color: var(--soft); white-space: nowrap;
+    }
+    .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--rival); }
+    .pill.ok { color: var(--good); border-color: var(--good); background: var(--good-soft); }
+    .pill.ok .dot { background: var(--good); }
+    .pill.bad { color: var(--hot); border-color: var(--hot); background: var(--hot-soft); }
+    .pill.bad .dot { background: var(--hot); }
+
+    /* ---------- legend ---------- */
+    .legend { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 16px 0 0; color: var(--soft); font-size: 12px; font-weight: 600; }
+    .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 6px; vertical-align: -1px; }
+    .legend .spacer { flex: 1 1 auto; }
+    .hint { max-width: 640px; }
+    .hint summary { cursor: pointer; font-weight: 600; color: var(--soft); }
+    .hint summary:hover { color: var(--brand); }
+    .hint p { margin: 7px 0 0; padding-left: 10px; border-left: 2px solid var(--brand); font-weight: 500; line-height: 1.5; }
+    .fcount { margin-left: 6px; padding: 1px 6px; border-radius: 999px; background: var(--brand); color: var(--brand-ink); font-size: 11px; }
+    #filterToggle[aria-expanded="true"] { border-color: var(--brand); color: var(--brand); }
+    .table-toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+
+    /* ---------- verdict hero ---------- */
+    .verdict {
+      margin: 14px 0 0;
+      border: 1px solid var(--line-2); border-radius: 18px;
+      background: var(--card); box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+    .verdict-grid { display: grid; grid-template-columns: 1.05fr auto 1fr auto 1fr; align-items: stretch; }
+    .vs-cell { padding: 20px 22px; min-width: 0; }
+    .vs-cell.me { background: linear-gradient(180deg, var(--brand-soft), transparent 78%); }
+    .vs-div { width: 1px; background: var(--line); }
+    .vs-kicker { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); }
+    .vs-name { margin-top: 8px; font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+    .vs-name.brandy { color: var(--brand); }
+    .vs-price { margin-top: 6px; font-size: 30px; font-weight: 700; letter-spacing: -.03em; }
+    .vs-unit { margin-left: 4px; font-family: "Inter", sans-serif; font-size: 13px; font-weight: 700; color: var(--soft); letter-spacing: 0; }
+    .vs-orig { margin-top: 5px; font-size: 12px; font-weight: 600; color: var(--soft); }
+    .vs-orig b { color: var(--ink); font-weight: 700; }
+    .vs-note { margin-top: 6px; color: var(--soft); font-size: 12px; line-height: 1.45; }
+    .vs-chip {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+      padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      background: var(--good-soft); color: var(--good);
+    }
+    .vs-chip.hot { background: var(--hot-soft); color: var(--hot); }
+    .vs-chip.neutral { background: var(--rival-soft); color: var(--soft); }
+    .headline {
+      padding: 16px 22px; border-top: 1px solid var(--line);
+      background: var(--card-2);
+      font-size: 15px; font-weight: 600; line-height: 1.5;
+    }
+    .headline b { color: var(--brand); }
+
+    /* ---------- controls ---------- */
+    .controls {
+      margin: 10px 0 0; padding: 12px 14px;
+      border: 1px solid var(--line); border-radius: 14px; background: var(--card);
+      display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;
+    }
+    .controls[hidden] { display: none; }
+    .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+    .field label { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--soft); }
+    .field .ctl {
+      height: 38px; padding: 0 11px; min-width: 170px;
+      border: 1px solid var(--line-2); border-radius: 10px; background: var(--card-2);
+      font-size: 13px; font-weight: 500;
+    }
+    .field.grow { flex: 1 1 240px; }
+    .field.grow .ctl { width: 100%; }
+    .controls .spacer { flex: 1 1 auto; }
+    .count { color: var(--soft); font-size: 12px; font-weight: 600; }
+
+    /* ---------- tabs ---------- */
+    /* ---------- sections ---------- */
+    .sec-head { margin: 26px 0 12px; }
+    .sec-kicker { display: flex; align-items: center; gap: 9px; font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--brand); }
+    .sec-kicker::before { content: ""; width: 18px; height: 2px; background: var(--brand); border-radius: 2px; }
+    h2 { margin: 7px 0 0; font-size: 19px; font-weight: 800; letter-spacing: -.02em; }
+    .sec-note { margin-top: 5px; color: var(--soft); font-size: 12.5px; max-width: 820px; line-height: 1.5; }
+
+    .card { min-width: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--card); box-shadow: var(--shadow); padding: 16px 18px; }
+    .grid-2 > *, .grid-3 > * { min-width: 0; }
+    .card-head { margin-bottom: 12px; }
+    .card-title { margin: 0; font-size: 14.5px; font-weight: 700; letter-spacing: -.01em; }
+    .card-sub { margin-top: 3px; color: var(--soft); font-size: 11.5px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 14px; }
+    .grid-2.wide-right { grid-template-columns: 1fr 1.18fr; }
+    .grid-2.quality-grid { grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr); }
+
+    /* ---------- kpi ---------- */
+    .kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .kpi { border: 1px solid var(--line); border-radius: 14px; background: var(--card); box-shadow: var(--shadow); padding: 15px 16px; }
+    .kpi.accent { border-color: var(--brand); background: linear-gradient(180deg, var(--brand-soft), var(--card) 65%); }
+    .kpi-label { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--soft); }
+    .kpi-value { margin-top: 9px; font-size: 27px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+    .kpi.accent .kpi-value { color: var(--brand); }
+    .kpi-foot { margin-top: 9px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .kpi-note { color: var(--soft); font-size: 11.5px; line-height: 1.4; }
+    .chip { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 7px; font-size: 11.5px; font-weight: 700; background: var(--rival-soft); color: var(--soft); white-space: nowrap; }
+    .chip.good { background: var(--good-soft); color: var(--good); }
+    .chip.hot { background: var(--hot-soft); color: var(--hot); }
+    .chip.brand { background: var(--brand-soft); color: var(--brand); }
+    .chip.gold { background: var(--gold-soft); color: var(--gold); }
+
+    /* ---------- charts ---------- */
+    .chart-box { position: relative; width: 100%; height: 320px; }
+    .chart-box.sm { height: 260px; }
+    .chart-box canvas { width: 100% !important; }
+
+    /* ---------- один на один: компактные строки ---------- */
+    .vs-list-card { padding: 4px 18px 14px; }
+    .vs-row { display: grid; grid-template-columns: minmax(0, 1fr) 168px; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .vs-row:last-of-type { border-bottom: 0; }
+    .vs-row.direct .vs-co { color: var(--brand); }
+    .vs-co { font-size: 14.5px; font-weight: 800; letter-spacing: -.01em; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .vs-prod { margin-top: 3px; color: var(--soft); font-size: 11.5px; }
+    .vs-pair { margin-top: 9px; display: grid; grid-template-columns: 78px 1fr; align-items: center; gap: 7px 10px; }
+    .vs-pair .who { color: var(--soft); font-size: 11px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bar-track { display: block; width: 100%; height: 11px; border-radius: 6px; background: var(--rival-soft); overflow: hidden; }
+    .bar-fill { display: block; height: 100%; min-width: 3px; border-radius: 6px; background: var(--rival); }
+    .bar-fill.me { background: var(--brand); }
+    .vs-side { text-align: right; }
+    .vs-side .p { font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+    .vs-side .u { margin-top: 1px; color: var(--soft); font-size: 11px; }
+    .vs-side .chip { margin-top: 6px; }
+    .vs-feats { margin-top: 9px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+    .feat { display: inline-flex; padding: 2px 7px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+    .feat.plus { background: var(--good-soft); color: var(--good); }
+    .feat.minus { background: var(--hot-soft); color: var(--hot); }
+    .feat.same { background: var(--rival-soft); color: var(--soft); }
+    .feat-key { color: var(--soft); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-right: 2px; }
+    .more-btn { width: 100%; margin-top: 12px; }
+
+    /* ---------- качество ---------- */
+    .tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+    .tile { padding: 14px 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--card-2); }
+    .tile-val { font-size: 24px; font-weight: 700; letter-spacing: -.03em; line-height: 1; color: var(--brand); }
+    .tile-lab { margin-top: 7px; color: var(--soft); font-size: 11.5px; font-weight: 600; }
+    .legend-inline { display: flex; gap: 14px; margin-top: 8px; color: var(--soft); font-size: 11.5px; font-weight: 600; }
+    .legend-inline i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+    .badges { display: flex; flex-wrap: wrap; gap: 5px; }
+    .badge { display: inline-flex; padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; background: var(--rival-soft); color: var(--soft); }
+    .badge.win { background: var(--card); border: 1px solid var(--brand); color: var(--brand); }
+    .badge.good { background: var(--good-soft); color: var(--good); }
+
+    /* ---------- свёрнутая таблица ---------- */
+    .fold { margin-top: 14px; padding: 0; }
+    .fold > summary {
+      cursor: pointer; list-style: none; padding: 15px 18px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      font-size: 14.5px; font-weight: 700;
+    }
+    .fold > summary::-webkit-details-marker { display: none; }
+    .fold > summary > span:first-child::before { content: "▸"; margin-right: 8px; color: var(--brand); }
+    .fold[open] > summary > span:first-child::before { content: "▾"; }
+    .fold[open] > summary { border-bottom: 1px solid var(--line); }
+    .fold > *:not(summary) { padding-left: 18px; padding-right: 18px; }
+    .fold > .table-wrap { padding-bottom: 16px; }
+
+    /* ---------- tables ---------- */
+    .table-wrap { max-width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    th, td { padding: 9px 11px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    th { position: sticky; top: 0; z-index: 1; background: var(--card-2); color: var(--soft); font-size: 10.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+    tbody tr:hover { background: var(--card-2); }
+    tr.me td { background: var(--brand-soft); font-weight: 700; }
+    tr.me td:first-child { box-shadow: inset 3px 0 0 var(--brand); }
+    td.right, th.right { text-align: right; }
+    td.soft { color: var(--soft); }
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { color: var(--brand); }
+    th.sorted { color: var(--brand); }
+    .ig-link { color: var(--brand); font-weight: 600; text-decoration: none; }
+    .ig-link:hover { text-decoration: underline; }
+    td.center, th.center { text-align: center; }
+    .yes { color: var(--brand); font-weight: 800; }
+    .no { color: var(--rival-2); }
+    .wrapcell { white-space: normal; min-width: 180px; }
+    #featureTable th, #featureTable td { padding-left: 7px; padding-right: 7px; }
+    #featureTable th { font-size: 10px; letter-spacing: .04em; }
+
+    .toast {
+      position: fixed; right: 18px; bottom: 18px; max-width: 340px;
+      padding: 13px 15px; border: 1px solid var(--line-2); border-radius: 12px;
+      background: var(--card); box-shadow: var(--shadow-lg);
+      font-size: 12.5px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: 200ms ease;
+    }
+    .toast.show { opacity: 1; transform: none; }
+    .toast strong { display: block; margin-bottom: 3px; }
+    .empty { padding: 30px; text-align: center; color: var(--soft); font-size: 13px; }
+
+    @media (max-width: 1100px) {
+      .verdict-grid { grid-template-columns: 1fr; }
+      .vs-div { width: auto; height: 1px; }
+      .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .grid-2, .grid-3, .grid-2.wide-right, .grid-2.quality-grid { grid-template-columns: 1fr; }
+      .vs-row { grid-template-columns: 1fr; gap: 10px; }
+      .vs-side { text-align: left; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    }
+    @media (max-width: 640px) {
+      .shell { padding: 16px 14px 48px; }
+      h1 { font-size: 20px; }
+      .kpis { grid-template-columns: 1fr; }
+      .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .vs-price { font-size: 26px; }
+      .field .ctl { min-width: 100%; }
+      .field { width: 100%; }
+    }
+    @media print {
+      .controls, .top-actions, .more-btn { display: none !important; }
+      .fold > *:not(summary) { display: block !important; }
+      .card, .kpi, .verdict, .vs-row { box-shadow: none; break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">Z</div>
+        <div>
+          <h1>Зерделі vs рынок</h1>
+          <div class="brand-sub">Цена, функции и наполнение Zerdeli App против конкурентов</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="pill" id="loadStatus"><span class="dot"></span><span>Загрузка…</span></span>
+        <button class="btn icon" id="refreshBtn" title="Обновить данные" aria-label="Обновить данные"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
+        <button class="btn icon" id="themeBtn" title="Сменить тему" aria-label="Сменить тему"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9c-4.97 0-9-4.03-9-9Z"/></svg></button>
+        <button class="btn" id="downloadBtn" title="Скачать сравнение в CSV">CSV</button>
+      </div>
+    </header>
+
+    <section class="verdict" aria-label="Итог сравнения">
+      <div class="verdict-grid">
+        <div class="vs-cell me">
+          <div class="vs-kicker">Наш продукт</div>
+          <div class="vs-name brandy">Zerdeli App</div>
+          <div class="vs-price num" id="vsMePrice">—<span class="vs-unit">/ мес</span></div>
+          <div class="vs-orig" id="vsMeOrig"></div>
+          <div class="vs-note" id="vsMeNote">—</div>
+        </div>
+        <div class="vs-div"></div>
+        <div class="vs-cell">
+          <div class="vs-kicker">Медиана конкурентов</div>
+          <div class="vs-name" id="vsMarketName">Рынок целиком</div>
+          <div class="vs-price num" id="vsMarketPrice">—<span class="vs-unit">/ мес</span></div>
+          <div class="vs-chip" id="vsMarketChip">—</div>
+          <div class="vs-note" id="vsMarketNote">—</div>
+        </div>
+        <div class="vs-div"></div>
+        <div class="vs-cell">
+          <div class="vs-kicker">Прямой конкурент</div>
+          <div class="vs-name" id="vsRivalName">—</div>
+          <div class="vs-price num" id="vsRivalPrice">—<span class="vs-unit">/ мес</span></div>
+          <div class="vs-orig" id="vsRivalOrig"></div>
+          <div class="vs-chip" id="vsRivalChip">—</div>
+          <div class="vs-note" id="vsRivalNote">—</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="legend">
+      <span><i style="background: var(--brand)"></i>Зерделі</span>
+      <span><i style="background: var(--rival)"></i>Конкуренты в Казахстане</span>
+      <span><i style="background: var(--rival-2)"></i>Международные</span>
+      <details class="hint">
+        <summary>Все цены — за один месяц. Как считаем?</summary>
+        <p>Пакет за 3 месяца, полугодие или год делится на срок, валюта пересчитывается в тенге. Реальная цена покупки указана рядом с приведённой.</p>
+      </details>
+      <div class="spacer"></div>
+      <button class="btn" id="filterToggle" type="button" aria-expanded="false">Фильтры<span class="fcount" id="filterCount" hidden></span></button>
+      <span class="count" id="viewCount"></span>
+    </div>
+
+    <section class="controls" id="controlsPanel" hidden>
+      <div class="field grow">
+        <label for="query">Поиск конкурента</label>
+        <input class="ctl" id="query" type="search" placeholder="Компания, продукт, предмет">
+      </div>
+      <div class="field">
+        <label for="ptype">Тип продукта</label>
+        <select class="ctl" id="ptype"><option value="">Все типы</option></select>
+      </div>
+      <div class="field">
+        <label for="region">Регион</label>
+        <select class="ctl" id="region"><option value="">Все регионы</option></select>
+      </div>
+      <div class="spacer"></div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <button class="btn" id="resetBtn" type="button">Сбросить</button>
+      </div>
+    </section>
+
+    <main>
+      <!-- ШАГ 1. ЦЕНА -->
+      <div class="sec-head">
+        <div class="sec-kicker">Шаг 1 · Цена</div>
+        <h2>Сколько стоит месяц занятий</h2>
+        <div class="sec-note">Все тарифы приведены к одному месяцу. Компании сгруппированы по типу продукта, у каждой взят самый дешёвый тариф.</div>
+      </div>
+      <section class="kpis" id="kpiGrid"></section>
+      <article class="card" style="margin-top:14px">
+        <div class="chart-box" id="mapBox"><canvas id="mapChart"></canvas></div>
+      </article>
+      <article class="card" style="margin-top:14px">
+        <div class="card-head">
+          <h3 class="card-title">Ценовые коридоры категорий</h3>
+          <div class="card-sub">Полоса — от самого дешёвого до самого дорогого тарифа категории, точка — медиана</div>
+        </div>
+        <div class="chart-box sm"><canvas id="rangeChart"></canvas></div>
+      </article>
+
+      <!-- ШАГ 2. НАПОЛНЕНИЕ -->
+      <div class="sec-head">
+        <div class="sec-kicker">Шаг 2 · Наполнение</div>
+        <h2>Что ученик получает за эти деньги</h2>
+        <div class="sec-note" id="qualityNote">Объём материала и набор функций — у тех компаний, которые публикуют данные.</div>
+      </div>
+      <div id="qualityTiles"></div>
+      <div id="tasksCard"></div>
+      <div class="grid-2 wide-right">
+        <article class="card">
+          <div class="card-head">
+            <h3 class="card-title">Столько же функций — другая цена</h3>
+            <div class="card-sub" id="sameSub">Компании, у которых функций не меньше, чем у Зерделі</div>
+          </div>
+          <div class="chart-box" id="sameBox"><canvas id="sameChart"></canvas></div>
+        </article>
+        <article class="card">
+          <div class="card-head">
+            <h3 class="card-title">Матрица функций</h3>
+            <div class="card-sub">По самому полному тарифу компании; строка Зерделі закреплена сверху</div>
+          </div>
+          <div class="table-wrap"><table id="featureTable"></table></div>
+        </article>
+      </div>
+
+      <!-- ШАГ 3. ОЦЕНКИ -->
+      <div class="sec-head">
+        <div class="sec-kicker">Шаг 3 · Мнение пользователей</div>
+        <h2>Как продукт оценивают в магазинах</h2>
+        <div class="sec-note">Точка — средняя оценка на шкале от 0 до 5. В скобках у подписи — сколько оценок за ней стоит.</div>
+      </div>
+      <div id="ratingCards"></div>
+
+      <!-- ШАГ 4. ОХВАТ -->
+      <div class="sec-head">
+        <div class="sec-kicker">Шаг 4 · Узнаваемость</div>
+        <h2>Кто вышел раньше и кого больше знают</h2>
+        <div class="sec-note">Возраст продукта во многом объясняет разрыв в аудитории: подписчики и установки копятся годами.</div>
+      </div>
+      <div id="reachCards"></div>
+
+      <!-- ШАГ 5. ОДИН НА ОДИН -->
+      <div class="sec-head">
+        <div class="sec-kicker">Шаг 5 · Прямое сравнение</div>
+        <h2>Зерделі против каждого конкурента</h2>
+        <div class="sec-note">По одной строке на компанию, взят её самый дешёвый тариф. Верхняя полоса — Зерделі, нижняя — конкурент.</div>
+      </div>
+      <article class="card vs-list-card">
+        <div class="vs-list" id="h2hGrid"></div>
+        <button class="btn more-btn" id="moreRivals" type="button" hidden></button>
+      </article>
+
+      <!-- ШАГ 6. ДЕТАЛИ -->
+      <div class="sec-head">
+        <div class="sec-kicker">Шаг 6 · Данные</div>
+        <h2>Всё в одной таблице</h2>
+        <div class="sec-note">Здесь собраны цифры из предыдущих шагов, чтобы можно было проверить любую из них.</div>
+      </div>
+      <div id="qualityTable"></div>
+      <details class="card fold" id="tableFold">
+        <summary>
+          <span>Все тарифы построчно</span>
+          <span class="count" id="tableCount"></span>
+        </summary>
+        <div class="table-toolbar">
+          <div class="field">
+            <label for="sortBy">Сортировка</label>
+            <select class="ctl" id="sortBy">
+              <option value="priceAsc">Цена: по возрастанию</option>
+              <option value="priceDesc">Цена: по убыванию</option>
+              <option value="deltaDesc">Разрыв с Зерделі</option>
+              <option value="companyAsc">Компания А-Я</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap"><table id="dataTable"></table></div>
+      </details>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* =========================================================================
+       ДАННЫЕ О НАПОЛНЕНИИ И ОЦЕНКАХ
+       Приоритет у листа Quality в Google-таблице: как только он появится,
+       эти значения перестанут использоваться.
+       Собрано вручную 12.08.2026: оценки — App Store и Google Play,
+       объём контента — сайты и описания приложений компаний.
+       Наполнение Зерделі — данные команды.
+       ========================================================================= */
+    const QUALITY_FALLBACK = [
+      /* компания, вопросы, карточки, тесты, челленджи, тренинги, языки,
+         оценка App Store, оценок AS, оценка Google Play, оценок GP, доп. возможности,
+         подписчики Instagram, установки Google Play (порог из магазина),
+         год выхода на рынок, аккаунт в Instagram */
+      ["Zerdeli App", 69311, 73166, 8205, 725, 67, "каз", 4.58, 45, 3.9, 53, "Челленджи с призами; Z-коины за тренинги; Обмен Z-коинов на игрушки и мерч", 2113, 10000, 2025, "zerdeli.app"],
+      ["Qalan", 40000, null, null, null, 1000, "каз; рус; азерб; узб", 2.82, 165, 2.8, 895, "ИИ-наставник; Менторы и AI-чат; Дуэли и лиги; Монеты и алмазы; Кэшбэк до 100 ₸ в день; Прогресс для родителей", 393000, 100000, 2018, "qalan.kz"],
+      ["iTest.kz", 60000, null, null, null, null, "каз; рус", 2.83, 243, 2.3, 2240, "16 предметов; конспекты лекций; работа над ошибками", 2681, 500000, 2016, "itest.kz"],
+      ["Khan Academy", 80000, null, null, null, 10000, "англ", 4.57, 109665, 4.1, null, "Бесплатно", null, null, 2008, null],
+      ["Prodigy Math", 50000, null, null, null, null, "англ", 4.76, 238709, 4.7, null, "1 500+ навыков; игровой мир", null, null, 2011, null],
+      ["IXL", 15000, null, null, null, null, "англ", 4.35, 203945, 4.0, null, "Аналитика для родителей", null, null, 1998, null],
+      ["SplashLearn", 4000, null, null, null, null, "англ", 4.51, 31962, 4.6, null, "4 000+ обучающих игр", null, null, 2010, null],
+      ["Beast Academy", 20000, null, null, null, 1000, "англ", null, null, null, null, "1 000+ видеоуроков; Puzzle Lab", null, null, 2012, null],
+      ["Brilliant", null, null, null, null, null, "англ", 4.74, 31625, null, null, "Новые курсы каждый месяц", null, null, 2012, null],
+      ["Bilim Plus", null, null, null, null, null, "каз; рус", null, null, null, null, "", null, null, null, null],
+      ["Dostyq Online", null, null, null, null, null, "каз; рус", null, null, null, null, "", 14000, null, null, "dostyqonline"],
+      ["AIPLUS", null, null, null, null, null, "каз; рус", null, null, 3.7, 344, "", 193000, 10000, 2015, "aiplus.kz"],
+      ["Daryn.online", null, null, null, null, null, "каз; рус", null, null, 4.5, 214, "500+ курсов; крупнейший курс — 1 870 уроков", 31000, 10000, 2018, "daryn.online"],
+      ["Mathletics", null, null, null, null, null, "англ", null, null, null, null, "", null, null, 2005, null],
+    ];
+
+    const SHEET_ID = "1Xv4zXp7pMrHMGYP9Fpfccf3h0Yf7dh9AE4Fpa3BGDH4";
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/export?format=csv&gid=0";
+    const GVIZ_URL = (sheet) => "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?sheet=" + encodeURIComponent(sheet) + "&tqx=out:json";
+    const QUALITY_SHEET = "Quality";
+    const REFRESH_MS = 5 * 60 * 1000;
+
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => [...document.querySelectorAll(s)];
+    const charts = {};
+
+    const TYPE_APP = "Приложения для самоучёбы";
+    const TYPE_TESTS = "Банки тестов";
+    const TYPE_LIVE = "Курсы и подготовка к ЕНТ";
+    const TYPE_ORDER = [TYPE_APP, TYPE_TESTS, TYPE_LIVE];
+
+    const FEATURES = [
+      ["selfStudy", "Самостоятельная учёба", "Самост. учёба"],
+      ["gamification", "Геймификация", "Геймификация"],
+      ["parentAnalytics", "Аналитика для родителей", "Аналитика"],
+      ["mentorAi", "Наставник / ИИ", "Наставник / ИИ"],
+      ["liveTeacher", "Живой преподаватель", "Живой педагог"],
+    ];
+
+    const state = {
+      rows: [],
+      base: [],
+      rivals: [],
+      view: [],
+      z: { min: null, max: null, rows: [], features: {}, type: TYPE_APP },
+      filters: { query: "", ptype: "", region: "", sortBy: "priceAsc" },
+      quality: null,
+      showAllRivals: false,
+      qSort: null,
+      loadedAt: null,
+    };
+
+    /* ---------------- helpers ---------------- */
+    const esc = (v) => String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const lower = (v) => String(v ?? "").toLocaleLowerCase("ru-RU");
+    const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+    function money(v, withUnit = true) {
+      if (!Number.isFinite(v)) return "—";
+      if (v === 0) return withUnit ? "0 ₸" : "0";
+      return new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(v) + (withUnit ? " ₸" : "");
+    }
+    function nf(v, d = 0) {
+      if (!Number.isFinite(v)) return "—";
+      return new Intl.NumberFormat("ru-RU", { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
+    }
+    function median(values) {
+      const s = values.filter(Number.isFinite).sort((a, b) => a - b);
+      if (!s.length) return null;
+      const m = Math.floor(s.length / 2);
+      return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+    }
+    /* «Zerdeli App» + «Zerdeli App: 3 месяца» -> «Zerdeli App · 3 месяца» */
+    function rowLabel(r) {
+      let p = String(r.product || "");
+      if (lower(p).startsWith(lower(r.company))) p = p.slice(r.company.length).replace(/^[\s:·\-–—]+/, "");
+      return short(r.company + (p ? " · " + p : ""), 42);
+    }
+    function short(v, max = 32) {
+      const t = String(v ?? "");
+      return t.length > max ? t.slice(0, max - 1) + "…" : t;
+    }
+    function num(value) {
+      const c = String(value ?? "").replace(/\s| /g, "").replace(",", ".");
+      if (c === "") return null;
+      const n = Number(c);
+      return Number.isFinite(n) ? n : null;
+    }
+    const yes = (v) => ["да", "yes", "true", "1", "y", "иә"].includes(String(v ?? "").trim().toLowerCase());
+
+    function regionOf(market) {
+      const m = lower(market);
+      if (m.includes("kazakh")) return "Казахстан";
+      if (m.includes("russia") || m.includes("снг") || m.includes("cis")) return "Россия / СНГ";
+      if (m) return "Международные";
+      return "Не указан";
+    }
+    function typeOf(row) {
+      const seg = lower(row.segment);
+      const fmt = lower(row.format);
+      if (seg.includes("test bank") || seg.includes("тест")) return TYPE_TESTS;
+      if (row.liveTeacher || seg.includes("exam prep") || seg.includes("tutoring") || seg.includes("school prep") || seg.includes("online school") || fmt.includes("zoom")) return TYPE_LIVE;
+      return TYPE_APP;
+    }
+    const isZ = (row) => lower(row.company).includes("zerdeli");
+
+    /* delta wording vs Zerdeli minimum price */
+    function deltaInfo(price) {
+      const z = state.z.min;
+      if (!Number.isFinite(price) || !Number.isFinite(z) || z <= 0) return { text: "—", tone: "", ratio: null };
+      if (price === 0) return { text: "бесплатно", tone: "good", ratio: 0 };
+      const ratio = price / z;
+      const pct = (ratio - 1) * 100;
+      if (ratio >= 1.02) {
+        const text = ratio >= 2 ? "дороже в " + nf(ratio, 1) + "×" : "дороже на " + nf(pct, 0) + "%";
+        return { text, tone: "hot", ratio };
+      }
+      if (ratio <= 0.98) return { text: "дешевле на " + nf(Math.abs(pct), 0) + "%", tone: "good", ratio };
+      return { text: "как у нас", tone: "", ratio };
+    }
+
+    function featureScore(row) { return FEATURES.reduce((s, [k]) => s + (row[k] ? 1 : 0), 0); }
+
+    /* --- реальная цена покупки, как она указана у продавца --- */
+    function currencySign(code) {
+      const c = String(code || "").toUpperCase();
+      if (c === "USD") return "$";
+      if (c === "RUB") return "₽";
+      if (c === "EUR") return "€";
+      return "₸";
+    }
+    function periodWord(months) {
+      if (!Number.isFinite(months) || months <= 0) return "";
+      if (months >= 11.5) return "год";
+      if (months >= 5.5 && months <= 6.5) return "полгода";
+      if (Math.abs(months - 1) < 0.01) return "месяц";
+      if (months < 1) return Math.round(months * 30) + " " + plural(Math.round(months * 30), "день", "дня", "дней");
+      const m = Math.round(months);
+      return m + " " + plural(m, "месяц", "месяца", "месяцев");
+    }
+    /* Возвращает "12 000 ₸ за 3 месяца" либо "" — если цена и так месячная в тенге */
+    function origLabel(row) {
+      if (!row || !Number.isFinite(row.priceOriginal)) return "";
+      if (row.priceOriginal === 0) return "бесплатно";
+      const sameAsMonthly = String(row.currency || "").toUpperCase() === "KZT" && Math.abs((row.periodMonths ?? 1) - 1) < 0.01;
+      if (sameAsMonthly) return "";
+      const per = periodWord(row.periodMonths);
+      const value = nf(row.priceOriginal, row.priceOriginal % 1 ? 2 : 0) + " " + currencySign(row.currency);
+      return per ? value + " за " + per : value;
+    }
+    /* Строка для подписи цены: "4 000 ₸ / мес" + пояснение */
+    function priceExplain(row) {
+      const o = origLabel(row);
+      return o ? "покупка: " + o : "цена указана за месяц";
+    }
+
+    /* ---------------- loading ---------------- */
+    function tableToObjects(table) {
+      const headers = (table.cols || []).map((c) => c.label || c.id || "");
+      return (table.rows || []).map((r) => {
+        const cells = r.c || [];
+        return Object.fromEntries(headers.map((h, i) => {
+          const cell = cells[i];
+          if (!cell) return [h, ""];
+          return [h, cell.f ?? cell.v ?? ""];
+        }));
+      });
+    }
+    function parseCsv(text) {
+      const rows = []; let row = []; let cell = ""; let q = false;
+      const src = text.replace(/^﻿/, "");
+      for (let i = 0; i < src.length; i += 1) {
+        const ch = src[i], nx = src[i + 1];
+        if (ch === '"') { if (q && nx === '"') { cell += '"'; i += 1; } else { q = !q; } }
+        else if (ch === "," && !q) { row.push(cell); cell = ""; }
+        else if ((ch === "\n" || ch === "\r") && !q) {
+          if (ch === "\r" && nx === "\n") i += 1;
+          row.push(cell);
+          if (row.some((v) => v !== "")) rows.push(row);
+          row = []; cell = "";
+        } else cell += ch;
+      }
+      row.push(cell);
+      if (row.some((v) => v !== "")) rows.push(row);
+      const headers = (rows.shift() || []).map((h) => h.trim());
+      return rows.map((vals) => Object.fromEntries(headers.map((h, i) => [h, vals[i] ?? ""])));
+    }
+    function loadGviz(sheet) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        const timer = setTimeout(() => { script.remove(); reject(new Error("timeout")); }, 20000);
+        window.google = window.google || {};
+        window.google.visualization = window.google.visualization || {};
+        window.google.visualization.Query = window.google.visualization.Query || {};
+        window.google.visualization.Query.setResponse = (res) => {
+          clearTimeout(timer); script.remove();
+          if (!res || res.status !== "ok") { reject(new Error(res?.status || "gviz")); return; }
+          resolve(tableToObjects(res.table));
+        };
+        script.onerror = () => { clearTimeout(timer); script.remove(); reject(new Error("script")); };
+        script.src = GVIZ_URL(sheet) + "&cacheBust=" + Date.now();
+        document.head.appendChild(script);
+      });
+    }
+    async function loadCsv() {
+      const res = await fetch(CSV_URL + "&cacheBust=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return parseCsv(await res.text());
+    }
+
+    function normalize(raw) {
+      const row = {
+        company: (raw.Company || "").trim(),
+        market: raw.Market || "",
+        product: (raw.Product || "").trim(),
+        segment: raw.Segment || "",
+        format: raw.Format || "",
+        grades: raw.Grades || "",
+        subjects: raw.Subjects_Exams || "",
+        priceOriginal: num(raw.Price_Original),
+        currency: raw.Currency || "",
+        periodMonths: num(raw.Period_Months),
+        price: num(raw.Price_KZT_Per_Month),
+        use: yes(raw.Dashboard_Use),
+        liveTeacher: yes(raw.Live_Teacher),
+        mentorAi: yes(raw.Mentor_AI_Support),
+        selfStudy: yes(raw.Self_Study),
+        gamification: yes(raw.Gamification),
+        parentAnalytics: yes(raw.Parent_Analytics),
+      };
+      row.region = regionOf(row.market);
+      row.type = typeOf(row);
+      row.score = featureScore(row);
+      row.isZ = isZ(row);
+      return row;
+    }
+
+    function splitList(value) {
+      return String(value ?? "").split(/[;\n]+/).map((v) => v.trim()).filter(Boolean);
+    }
+
+    /* если листа Quality нет — берём встроенный набор */
+    function builtinQuality() {
+      const map = new Map();
+      QUALITY_FALLBACK.forEach(([company, tasks, cards, tests, challenges, lessons, languages, rating, ratings, ratingGp, ratingsGp, extras, instagram, installs, founded, ig]) => {
+        map.set(lower(company), {
+          company,
+          tasks, cards, tests, challenges, lessons,
+          languages: languages || "",
+          grades: "",
+          rating, ratings, ratingGp, ratingsGp,
+          instagram, installs, founded, ig,
+          achievements: [],
+          extras: splitList(extras),
+          note: "",
+        });
+      });
+      return map;
+    }
+
+    /* необязательный лист Quality: наполнение и достижения по компаниям */
+    async function loadQuality() {
+      let rows = null;
+      try { rows = await loadGviz(QUALITY_SHEET); } catch (e) { return null; }
+      if (!rows || !rows.length) return null;
+      /* если листа Quality нет, Google подставляет первый лист — узнаём его по колонкам */
+      const headers = Object.keys(rows[0] || {});
+      if (!["Tasks", "Lessons", "Cards", "Tests", "Challenges", "Rating", "Instagram", "Languages", "Achievements", "Extras"].some((h) => headers.includes(h))) return null;
+      const map = new Map();
+      rows.forEach((r) => {
+        const name = String(r.Company ?? "").trim();
+        if (!name) return;
+        map.set(lower(name), {
+          company: name,
+          tasks: num(r.Tasks),
+          lessons: num(r.Lessons),
+          cards: num(r.Cards),
+          tests: num(r.Tests),
+          challenges: num(r.Challenges),
+          rating: num(r.Rating),
+          ratings: num(r.Ratings_Count),
+          ratingGp: num(r.Rating_GP),
+          ratingsGp: num(r.Ratings_Count_GP),
+          instagram: num(r.Instagram),
+          installs: num(r.Installs_GP),
+          founded: num(r.Founded),
+          ig: String(r.Instagram_Handle ?? "").trim().replace(/^@/, ""),
+          languages: String(r.Languages ?? "").trim(),
+          grades: String(r.Grades ?? "").trim(),
+          achievements: splitList(r.Achievements),
+          extras: splitList(r.Extras),
+          note: String(r.Note ?? "").trim(),
+        });
+      });
+      return map.size ? map : null;
+    }
+
+    function setStatus(kind, text) {
+      const el = $("#loadStatus");
+      el.className = "pill" + (kind ? " " + kind : "");
+      el.innerHTML = '<span class="dot"></span><span>' + esc(text) + "</span>";
+    }
+    function toast(title, body) {
+      const t = $("#toast");
+      t.innerHTML = "<strong>" + esc(title) + "</strong>" + esc(body);
+      t.classList.add("show");
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => t.classList.remove("show"), 5000);
+    }
+
+    async function load(showToast) {
+      setStatus("", "Загрузка…");
+      let raw = null;
+      try { raw = await loadGviz("Raw_Prices"); }
+      catch (e) { try { raw = await loadCsv(); } catch (e2) { raw = null; } }
+      if (!raw) {
+        setStatus("bad", "Нет связи с таблицей");
+        toast("Не удалось обновить", "Проверьте доступ к Google Таблице и интернет-соединение.");
+        return;
+      }
+      state.rows = raw.map(normalize).filter((r) => r.company);
+      state.base = state.rows.filter((r) => r.use && Number.isFinite(r.price));
+      state.z.rows = state.base.filter((r) => r.isZ);
+      const zSorted = state.z.rows.slice().sort((a, b) => a.price - b.price);
+      state.z.minRow = zSorted[0] || null;
+      state.z.maxRow = zSorted[zSorted.length - 1] || null;
+      state.z.min = state.z.minRow ? state.z.minRow.price : null;
+      state.z.max = state.z.maxRow ? state.z.maxRow.price : null;
+      state.z.plan = state.z.minRow && Number.isFinite(state.z.minRow.priceOriginal) && (state.z.minRow.periodMonths > 1)
+        ? money(state.z.minRow.priceOriginal) + " за " + nf(state.z.minRow.periodMonths, 0) + " " + plural(state.z.minRow.periodMonths, "месяц", "месяца", "месяцев")
+        : "";
+      const zBest = state.z.rows.slice().sort((a, b) => b.score - a.score)[0] || null;
+      state.z.features = {};
+      FEATURES.forEach(([k]) => { state.z.features[k] = zBest ? !!zBest[k] : false; });
+      state.z.score = zBest ? zBest.score : 0;
+      state.z.type = zBest ? zBest.type : TYPE_APP;
+      state.z.grades = zBest ? zBest.grades : "";
+      state.z.subjects = zBest ? zBest.subjects : "";
+      const fromSheet = await loadQuality();
+      state.quality = fromSheet || builtinQuality();
+      state.qualitySource = fromSheet ? "лист Quality" : "ручной сбор 12.08.2026";
+      state.loadedAt = new Date();
+      buildSelects();
+      setStatus("ok", "Данные актуальны · " + state.loadedAt.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }));
+      if (showToast) toast("Обновлено", "Сравнение пересчитано по свежим данным таблицы.");
+      apply();
+    }
+
+    /* ---------------- filters ---------------- */
+    function buildSelects() {
+      const rivals = state.base.filter((r) => !r.isZ);
+      const types = TYPE_ORDER.filter((t) => rivals.some((r) => r.type === t));
+      const regions = [...new Set(rivals.map((r) => r.region))].sort((a, b) => a.localeCompare(b, "ru"));
+      fill("#ptype", "Все типы", types);
+      fill("#region", "Все регионы", regions);
+    }
+    function fill(sel, first, values) {
+      const el = $(sel), prev = el.value;
+      el.innerHTML = '<option value="">' + first + "</option>" + values.map((v) => '<option value="' + esc(v) + '">' + esc(v) + "</option>").join("");
+      if (values.includes(prev)) el.value = prev;
+    }
+
+    function apply() {
+      state.filters = {
+        query: $("#query").value.trim(),
+        ptype: $("#ptype").value,
+        region: $("#region").value,
+        sortBy: $("#sortBy").value,
+      };
+      const q = lower(state.filters.query);
+      state.rivals = state.base.filter((r) => {
+        if (r.isZ) return false;
+        if (state.filters.ptype && r.type !== state.filters.ptype) return false;
+        if (state.filters.region && r.region !== state.filters.region) return false;
+        if (q) {
+          const hay = [r.company, r.product, r.segment, r.subjects, r.grades, r.format, r.region, r.type].join(" ");
+          if (!lower(hay).includes(q)) return false;
+        }
+        return true;
+      });
+      state.view = sortRows([...state.z.rows, ...state.rivals]);
+      $("#viewCount").textContent = state.rivals.length + " " + plural(state.rivals.length, "тариф", "тарифа", "тарифов") + " конкурентов в сравнении";
+      const active = [state.filters.query, state.filters.ptype, state.filters.region].filter(Boolean).length;
+      const badge = $("#filterCount");
+      badge.textContent = active;
+      badge.hidden = !active;
+      render();
+    }
+    function sortRows(rows) {
+      const by = state.filters.sortBy;
+      const z = state.z.min ?? 0;
+      const copy = [...rows];
+      if (by === "priceDesc") copy.sort((a, b) => b.price - a.price);
+      else if (by === "companyAsc") copy.sort((a, b) => a.company.localeCompare(b.company, "ru") || a.price - b.price);
+      else if (by === "deltaDesc") copy.sort((a, b) => Math.abs(b.price - z) - Math.abs(a.price - z));
+      else copy.sort((a, b) => a.price - b.price);
+      return copy;
+    }
+
+    /* ---------------- render ---------------- */
+    function render() {
+      renderVerdict();
+      renderKpis();
+      renderPriceMap();
+      renderRangeChart();
+      renderFeatures();   /* до выводов: считает состояние функций для «что это значит» */
+      renderH2H();
+      renderQuality();
+      renderSameFeatures();
+      renderTable();
+    }
+
+    function directRival() {
+      /* ближайший по смыслу конкурент: тот же тип продукта и тот же регион, максимальная цена-ориентир */
+      const same = state.rivals.filter((r) => r.type === state.z.type && r.region === "Казахстан");
+      const pool = same.length ? same : state.rivals.filter((r) => r.type === state.z.type);
+      if (!pool.length) return null;
+      return pool.slice().sort((a, b) => b.score - a.score || b.price - a.price)[0];
+    }
+
+    function priceHtml(value) { return money(value) + '<span class="vs-unit">/ мес</span>'; }
+
+    /* классы и предметы берём из данных, ничего не зашиваем */
+    function zFacts() {
+      const parts = [];
+      if (state.z.grades) parts.push("классы " + state.z.grades);
+      if (state.z.subjects) parts.push(state.z.subjects.replace(/;\s*/g, ", "));
+      return parts.join(" · ");
+    }
+
+    function renderVerdict() {
+      const z = state.z.min;
+      const zRow = state.z.minRow;
+      $("#vsMePrice").innerHTML = priceHtml(z);
+      $("#vsMeOrig").innerHTML = zRow && origLabel(zRow)
+        ? "Платите <b>" + esc(origLabel(zRow)) + "</b> — это " + money(z) + " в месяц"
+        : "";
+      $("#vsMeNote").innerHTML = state.z.rows.length
+        ? "или " + money(state.z.max) + " при оплате помесячно<br>" + esc(zFacts())
+        : "нет данных";
+
+      const rivalPrices = state.rivals.map((r) => r.price);
+      const med = median(rivalPrices);
+      $("#vsMarketPrice").innerHTML = priceHtml(med);
+      $("#vsMarketName").textContent = state.filters.ptype || (state.filters.region ? state.filters.region : "Весь рынок");
+      const dm = deltaInfo(med);
+      const chip = $("#vsMarketChip");
+      if (Number.isFinite(med) && Number.isFinite(z)) {
+        const cheaper = med > z;
+        chip.className = "vs-chip" + (cheaper ? "" : " hot");
+        chip.textContent = cheaper
+          ? "Зерделі дешевле на " + nf((1 - z / med) * 100, 0) + "%"
+          : "Зерделі дороже на " + nf((z / med - 1) * 100, 0) + "%";
+      } else { chip.className = "vs-chip neutral"; chip.textContent = "нет данных"; }
+      const dearer = state.rivals.filter((r) => r.price > z).length;
+      const companies = new Set(state.rivals.map((r) => r.company)).size;
+      $("#vsMarketNote").textContent = dearer + " из " + state.rivals.length + " тарифов дороже нас · "
+        + companies + " " + plural(companies, "компания", "компании", "компаний");
+
+      const rival = directRival();
+      if (rival) {
+        $("#vsRivalName").textContent = rival.company;
+        $("#vsRivalPrice").innerHTML = priceHtml(rival.price);
+        $("#vsRivalOrig").innerHTML = origLabel(rival) ? "тариф: <b>" + esc(origLabel(rival)) + "</b>" : "";
+        const d = deltaInfo(rival.price);
+        const rc = $("#vsRivalChip");
+        rc.className = "vs-chip" + (d.tone === "hot" ? "" : " hot");
+        rc.textContent = d.tone === "hot"
+          ? "мы дешевле в " + nf(rival.price / z, 1) + "×"
+          : "мы дороже на " + nf((z / rival.price - 1) * 100, 0) + "%";
+        $("#vsRivalNote").textContent = short(rival.product, 46) + " · " + rival.type.toLowerCase();
+      } else {
+        $("#vsRivalName").textContent = "—";
+        $("#vsRivalPrice").innerHTML = "—";
+        $("#vsRivalOrig").innerHTML = "";
+        $("#vsRivalChip").className = "vs-chip neutral";
+        $("#vsRivalChip").textContent = "нет прямых конкурентов в выборке";
+        $("#vsRivalNote").textContent = "";
+      }
+
+    }
+
+    function renderKpis() {
+      const z = state.z.min;
+      const rivals = state.rivals;
+      const prices = rivals.map((r) => r.price);
+      const med = median(prices);
+      const dearer = rivals.filter((r) => r.price > z).length;
+      const cheaper = rivals.filter((r) => r.price < z).length;
+      const sameType = rivals.filter((r) => r.type === state.z.type);
+      const medSame = median(sameType.map((r) => r.price));
+
+      /* какой тип продуктов преобладает среди тех, кто дешевле нас */
+      const cheaperTypes = {};
+      rivals.filter((r) => r.price < z).forEach((r) => { cheaperTypes[r.type] = (cheaperTypes[r.type] || 0) + 1; });
+      const cheaperMostly = Object.keys(cheaperTypes).sort((a, b) => cheaperTypes[b] - cheaperTypes[a])[0] || "";
+
+      /* Цена, медиана рынка и прямой конкурент уже показаны в шапке — здесь только то, чего там нет */
+      const cards = [
+        {
+          accent: true,
+          label: "Дешевле, чем",
+          value: dearer + " из " + rivals.length,
+          chip: rivals.length ? ["good", nf((dearer / rivals.length) * 100, 0) + "% рынка"] : ["", "—"],
+          note: cheaper
+            ? cheaper + " " + plural(cheaper, "тариф", "тарифа", "тарифов") + " дешевле нас"
+              + (cheaperMostly ? " — в основном «" + cheaperMostly.toLowerCase() + "»" : "")
+            : "дешевле нас нет никого",
+        },
+        {
+          label: "Своя категория",
+          value: money(medSame),
+          chip: Number.isFinite(medSame) && medSame > z ? ["good", "мы −" + nf((1 - z / medSame) * 100, 0) + "%"] : ["", "—"],
+          note: "медиана в категории «" + state.z.type.toLowerCase() + "» — " + sameType.length + " " + plural(sameType.length, "тариф", "тарифа", "тарифов"),
+        },
+      ];
+
+      void med;
+
+      $("#kpiGrid").style.gridTemplateColumns = "repeat(" + Math.min(3, Math.max(1, cards.length)) + ", minmax(0, 1fr))";
+      $("#kpiGrid").innerHTML = cards.map((c) => (
+        '<article class="kpi' + (c.accent ? " accent" : "") + '">' +
+        '<div class="kpi-label">' + esc(c.label) + "</div>" +
+        '<div class="kpi-value num">' + esc(c.value) + "</div>" +
+        '<div class="kpi-foot"><span class="chip ' + c.chip[0] + '">' + esc(c.chip[1]) + "</span></div>" +
+        '<div class="kpi-note">' + esc(c.note) + "</div>" +
+        "</article>"
+      )).join("");
+    }
+
+    /* одна строка на компанию — самый полный тариф */
+    function companyRows(rows) {
+      const map = new Map();
+      rows.forEach((r) => {
+        const cur = map.get(r.company);
+        if (!cur || r.score > cur.score) map.set(r.company, r);
+      });
+      return [...map.values()];
+    }
+    /* одна строка на компанию — самый дешёвый тариф */
+    function cheapestRows(rows) {
+      const map = new Map();
+      rows.forEach((r) => {
+        const cur = map.get(r.company);
+        if (!cur || r.price < cur.price) map.set(r.company, r);
+      });
+      return [...map.values()];
+    }
+
+    /* ---------------- charts ---------------- */
+    const guides = {
+      id: "guides",
+      afterDatasetsDraw(chart) {
+        const items = chart.options.plugins?.guides?.items || [];
+        if (!items.length) return;
+        const { ctx, chartArea: area, scales } = chart;
+        items.forEach((g) => {
+          const scale = scales[g.axis];
+          if (!scale || !Number.isFinite(g.value)) return;
+          const pos = scale.getPixelForValue(g.value);
+          ctx.save();
+          ctx.setLineDash([5, 4]);
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = g.color;
+          ctx.beginPath();
+          if (g.axis === "x") { ctx.moveTo(pos, area.top); ctx.lineTo(pos, area.bottom); }
+          else { ctx.moveTo(area.left, pos); ctx.lineTo(area.right, pos); }
+          ctx.stroke();
+          if (g.label) {
+            ctx.setLineDash([]);
+            ctx.font = '700 11px Inter, sans-serif';
+            const w = ctx.measureText(g.label).width + 14;
+            let x = g.axis === "x" ? Math.min(pos + 6, area.right - w - 2) : area.right - w - 4;
+            let y = g.axis === "x" ? area.top + 3 + (g.offset || 0) : Math.max(area.top + 3, pos - 22);
+            ctx.fillStyle = g.color;
+            if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x, y, w, 19, 6); ctx.fill(); }
+            else ctx.fillRect(x, y, w, 19);
+            ctx.fillStyle = g.textColor || "#fff";
+            ctx.textBaseline = "middle";
+            ctx.fillText(g.label, x + 7, y + 10);
+          }
+          ctx.restore();
+        });
+      },
+    };
+    /* фон-полосы под группами категорий + подпись группы */
+    const bands = {
+      id: "bands",
+      beforeDatasetsDraw(chart) {
+        const items = chart.options.plugins?.bands?.items || [];
+        if (!items.length) return;
+        const { ctx, chartArea: area, scales } = chart;
+        const y = scales.y;
+        if (!y) return;
+        const rowH = (area.bottom - area.top) / Math.max(1, y.getLabels().length);
+        items.forEach((b) => {
+          const top = y.getPixelForValue(b.from) - rowH / 2;
+          const bottom = y.getPixelForValue(b.to) + rowH / 2;
+          ctx.save();
+          if (b.fill) {
+            ctx.fillStyle = b.fill;
+            ctx.fillRect(area.left, top, area.right - area.left, bottom - top);
+          }
+          ctx.font = '800 10.5px Inter, sans-serif';
+          ctx.fillStyle = b.text;
+          ctx.textBaseline = "middle";
+          ctx.fillText(b.label.toUpperCase(), area.left + 6, y.getPixelForValue(b.caption));
+          ctx.restore();
+        });
+      },
+    };
+
+    /* точки поверх полос-диапазонов */
+    const dots = {
+      id: "dots",
+      afterDatasetsDraw(chart) {
+        const items = chart.options.plugins?.dots?.items || [];
+        if (!items.length) return;
+        const { ctx, scales } = chart;
+        items.forEach((d) => {
+          if (!Number.isFinite(d.value)) return;
+          const x = scales.x.getPixelForValue(d.value);
+          const y = scales.y.getPixelForValue(d.index);
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(x, y, d.r || 6, 0, Math.PI * 2);
+          ctx.fillStyle = d.color;
+          ctx.fill();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = d.ring;
+          ctx.stroke();
+          ctx.restore();
+        });
+      },
+    };
+
+    /* значения прямо у конца полос — чтобы не приходилось наводить мышь.
+       В опциях только примитивы: функции Chart.js вызывает как scriptable-опции. */
+    const barLabels = {
+      id: "barLabels",
+      afterDatasetsDraw(chart) {
+        const cfg = chart.options.plugins?.barLabels;
+        if (!cfg || typeof cfg.digits !== "number") return;
+        const { ctx } = chart;
+        ctx.save();
+        ctx.font = '700 11px Inter, sans-serif';
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "left";
+        chart.data.datasets.forEach((ds, di) => {
+          const meta = chart.getDatasetMeta(di);
+          if (meta.hidden) return;
+          meta.data.forEach((bar, i) => {
+            const raw = ds.data[i];
+            if (!Number.isFinite(raw) && !Array.isArray(raw)) return;
+            ctx.fillStyle = i === cfg.meIndex ? cfg.meColor : cfg.color;
+            const value = Array.isArray(raw) ? raw[0] : raw;
+            if (!Number.isFinite(value)) return;
+            const text = cfg.asYear ? String(value) : nf(value, cfg.digits) + (cfg.suffix || "");
+            if (cfg.atStart) {
+              ctx.textAlign = "right";
+              ctx.fillText(text, (bar.base ?? bar.x) - 9, bar.y);
+              ctx.textAlign = "left";
+            } else {
+              ctx.fillText(text, bar.x + 7, bar.y);
+            }
+          });
+        });
+        ctx.restore();
+      },
+    };
+
+    if (window.Chart) {
+      Chart.register(guides, bands, dots, barLabels);
+      Chart.defaults.font.family = '"Inter", "Segoe UI", Arial, sans-serif';
+      Chart.defaults.font.size = 11;
+    }
+
+    /* Цвет полосы: Зерделі — акцент, казахстанские конкуренты темнее, международные светлее.
+       Оба серых остаются приглушёнными, чтобы фокус не уходил с Зерделі. */
+    const isKz = (region) => String(region || "").indexOf("Казахстан") === 0;
+    const barColor = (p, me, region) => (me ? p.brand : (isKz(region) ? p.rival : p.rival2));
+
+    function palette() {
+      return {
+        brand: cssVar("--brand"),
+        brand2: cssVar("--brand-2"),
+        rival: cssVar("--rival"),
+        rival2: cssVar("--rival-2"),
+        hot: cssVar("--hot"),
+        good: cssVar("--good"),
+        gold: cssVar("--gold"),
+        ink: cssVar("--ink"),
+        soft: cssVar("--soft"),
+        grid: cssVar("--grid"),
+        card: cssVar("--card"),
+      };
+    }
+    function mount(key, canvasId, config) {
+      const el = document.getElementById(canvasId);
+      if (!el || !window.Chart) return;
+      if (charts[key]) charts[key].destroy();
+      charts[key] = new Chart(el.getContext("2d"), config);
+    }
+    function baseOptions(p) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 380 },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: p.ink,
+            titleColor: p.card,
+            bodyColor: p.card,
+            padding: 10,
+            cornerRadius: 8,
+            displayColors: false,
+          },
+        },
+      };
+    }
+
+    /* ---- 1. Ценовая карта: компании, сгруппированные по типу продукта ---- */
+    function renderPriceMap() {
+      const p = palette();
+      const z = state.z.min;
+      const zRow = state.z.minRow;
+      const rivals = cheapestRows(state.rivals);
+      const order = [state.z.type].concat(TYPE_ORDER.filter((t) => t !== state.z.type));
+
+      const rows = [];
+      const groups = [];
+      order.forEach((type) => {
+        let items = rivals.filter((r) => r.type === type);
+        if (zRow && zRow.type === type) items = items.concat([zRow]);
+        if (!items.length) return;
+        items.sort((a, b) => a.price - b.price);
+        const caption = rows.length;          /* пустая строка под заголовок группы */
+        rows.push({ spacer: true, type });
+        groups.push({ type, caption, from: caption, to: rows.length + items.length - 1 });
+        rows.push(...items);
+      });
+
+      if (!rows.length) { if (charts.map) { charts.map.destroy(); delete charts.map; } return; }
+
+      $("#mapBox").style.height = Math.max(260, rows.length * 32 + 78) + "px";
+      const mapW = $("#mapBox").clientWidth || 700;
+      const bandFills = ["rgba(0,0,0,0)", cssVar("--rival-soft")];
+
+      mount("map", "mapChart", {
+        type: "bar",
+        data: {
+          labels: rows.map((r) => (r.spacer ? "" : (r.isZ ? "Зерделі" : short(r.company, 20)))),
+          datasets: [{
+            data: rows.map((r) => (r.spacer ? null : r.price)),
+            backgroundColor: rows.map((r) => barColor(p, r.isZ, r.region)),
+            borderRadius: 6,
+            barPercentage: 0.6,
+            categoryPercentage: 0.94,
+          }],
+        },
+        options: {
+          ...baseOptions(p),
+          indexAxis: "y",
+          layout: { padding: { top: 6, right: 12 } },
+          plugins: {
+            ...baseOptions(p).plugins,
+            bands: {
+              items: groups.map((g, i) => ({
+                from: g.from, to: g.to, caption: g.caption,
+                fill: bandFills[i % 2],
+                label: g.type,
+                text: p.soft,
+              })),
+            },
+            guides: { items: [{ axis: "x", value: z, color: p.brand, label: "Зерделі " + money(z), offset: 24 }] },
+            tooltip: {
+              ...baseOptions(p).plugins.tooltip,
+              callbacks: {
+                title: (items) => (rows[items[0].dataIndex] || {}).company || "",
+                label: (ctx) => {
+                  const r = rows[ctx.dataIndex];
+                  if (!r || r.spacer) return "";
+                  const d = deltaInfo(r.price);
+                  return [money(r.price) + " / мес", priceExplain(r), r.isZ ? "наш тариф" : d.text, short(r.product, 40)];
+                },
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { color: p.grid }, border: { display: false },
+              ticks: { color: p.soft, font: { size: 11.5 }, callback: (v) => money(v) },
+            },
+            y: {
+              grid: { display: false }, border: { display: false },
+              afterFit: (scale) => { scale.width = Math.min(scale.width, mapW * 0.46); },
+              ticks: {
+                color: p.text, autoSkip: false,
+                font: (ctx) => ({ size: 12.5, weight: rows[ctx.index] && rows[ctx.index].isZ ? "800" : "600" }),
+                padding: 2,
+              },
+            },
+          },
+        },
+      });
+    }
+
+    /* ---- 2. Ценовые коридоры категорий: от минимума до максимума + медиана ---- */
+    function renderRangeChart() {
+      const p = palette();
+      const z = state.z.min;
+      const types = TYPE_ORDER.filter((t) => state.rivals.some((r) => r.type === t));
+      const stats = types.map((t) => {
+        const values = state.rivals.filter((r) => r.type === t).map((r) => r.price);
+        return { min: Math.min(...values), max: Math.max(...values), med: median(values), n: values.length };
+      });
+
+      mount("range", "rangeChart", {
+        type: "bar",
+        data: {
+          labels: types.map((t) => t.replace("Приложения для самоучёбы", "Приложения").replace("Курсы и подготовка к ЕНТ", "Курсы и ЕНТ")),
+          datasets: [{
+            data: stats.map((s) => [s.min, s.max]),
+            backgroundColor: types.map((t) => (t === state.z.type ? cssVar("--brand-soft") : cssVar("--rival-soft"))),
+            borderColor: types.map((t) => (t === state.z.type ? p.brand : p.rival2)),
+            borderWidth: 1,
+            borderRadius: 7,
+            barPercentage: 0.5,
+          }],
+        },
+        options: {
+          ...baseOptions(p),
+          indexAxis: "y",
+          plugins: {
+            ...baseOptions(p).plugins,
+            dots: {
+              items: stats.map((s, i) => ({
+                index: i, value: s.med,
+                color: types[i] === state.z.type ? p.brand : p.rival,
+                ring: p.card,
+              })),
+            },
+            guides: { items: [{ axis: "x", value: z, color: p.brand, label: "Зерделі " + money(z) }] },
+            tooltip: {
+              ...baseOptions(p).plugins.tooltip,
+              callbacks: {
+                title: (items) => types[items[0].dataIndex],
+                label: (ctx) => {
+                  const s = stats[ctx.dataIndex];
+                  return ["от " + money(s.min) + " до " + money(s.max), "медиана " + money(s.med), s.n + " " + plural(s.n, "тариф", "тарифа", "тарифов")];
+                },
+              },
+            },
+          },
+          scales: {
+            x: { grid: { color: p.grid }, border: { display: false }, ticks: { color: p.soft, font: { size: 11.5 }, callback: (v) => money(v) } },
+            y: { grid: { display: false }, border: { display: false }, ticks: { color: p.text, font: { size: 12.5, weight: "600" } } },
+          },
+        },
+      });
+    }
+
+    /* ---- 3. Кто даёт столько же функций и сколько за это просит ---- */
+    function renderSameFeatures() {
+      const p = palette();
+      const zRow = state.z.minRow;
+      const zScore = state.z.score;
+      /* у каждой компании берём самый дешёвый тариф, в котором функций не меньше, чем у нас */
+      let rivals = cheapestRows(state.rivals.filter((r) => r.score >= zScore));
+      let note = "Их самый дешёвый тариф, где функций не меньше, чем у Зерделі (" + zScore + " из 5)";
+      if (rivals.length < 3) {
+        rivals = cheapestRows(state.rivals).slice().sort((a, b) => b.score - a.score).slice(0, 8);
+        note = "Компании с самым полным набором функций в текущей выборке";
+      }
+      $("#sameSub").textContent = note + ". Полоса — цена за месяц";
+
+      const rows = (zRow ? rivals.concat([zRow]) : rivals).sort((a, b) => a.price - b.price);
+      if (!rows.length) { if (charts.same) { charts.same.destroy(); delete charts.same; } return; }
+      $("#sameBox").style.height = Math.max(240, rows.length * 34 + 60) + "px";
+      const sameW = $("#sameBox").clientWidth || 600;
+      const narrow = sameW < 520;
+
+      mount("same", "sameChart", {
+        type: "bar",
+        data: {
+          labels: rows.map((r) => (r.isZ ? "Зерделі" : short(r.company, narrow ? 13 : 16)) + (narrow ? "" : " · " + r.score + " " + plural(r.score, "функция", "функции", "функций"))),
+          datasets: [{
+            data: rows.map((r) => r.price),
+            backgroundColor: rows.map((r) => barColor(p, r.isZ, r.region)),
+            borderRadius: 6,
+            barPercentage: 0.62,
+          }],
+        },
+        options: {
+          ...baseOptions(p),
+          indexAxis: "y",
+          layout: { padding: { top: 6, right: 12 } },
+          plugins: {
+            ...baseOptions(p).plugins,
+            guides: { items: [{ axis: "x", value: state.z.min, color: p.brand, label: "Зерделі " + money(state.z.min) }] },
+            tooltip: {
+              ...baseOptions(p).plugins.tooltip,
+              callbacks: {
+                title: (items) => rows[items[0].dataIndex].company,
+                label: (ctx) => {
+                  const r = rows[ctx.dataIndex];
+                  const d = deltaInfo(r.price);
+                  return [money(r.price) + " / мес", priceExplain(r), r.isZ ? "наш тариф" : d.text, "функций: " + r.score + " из 5"];
+                },
+              },
+            },
+          },
+          scales: {
+            x: { grid: { color: p.grid }, border: { display: false }, ticks: { color: p.soft, font: { size: 11.5 }, callback: (v) => money(v) } },
+            y: {
+              grid: { display: false }, border: { display: false },
+              afterFit: (scale) => { scale.width = Math.min(scale.width, sameW * 0.46); },
+              ticks: {
+                color: p.text, autoSkip: false, padding: 2,
+                font: (ctx) => ({ size: 12, weight: rows[ctx.index] && rows[ctx.index].isZ ? "800" : "600" }),
+              },
+            },
+          },
+        },
+      });
+    }
+
+    /* ---- Наполнение и качество: лист Quality, если он заведён ---- */
+    function renderQuality() {
+      const put = (id, markup) => { const el = $("#" + id); if (el) el.innerHTML = markup; };
+      ["tasks", "storesAs", "storesGp", "reachIg", "reachIn", "age"].forEach((k) => {
+        if (charts[k]) { charts[k].destroy(); delete charts[k]; }
+      });
+
+      const q = state.quality;
+      const zName = state.z.minRow ? lower(state.z.minRow.company) : "zerdeli app";
+      const zQ = q ? (q.get(zName) || [...q.values()].find((v) => lower(v.company).includes("zerdeli"))) : null;
+
+      if (!q || !zQ) {
+        ["qualityTiles", "tasksCard", "ratingCards", "reachCards"].forEach((id) => put(id, ""));
+        put("qualityTable", qualitySetupHtml());
+        return;
+      }
+      const noteEl = $("#qualityNote");
+      if (noteEl) noteEl.textContent = "Объём материала, оценки в сторах и дополнительные возможности. Источник данных — " + (state.qualitySource || "");
+
+      const companies = companyRows(state.rivals).map((r) => ({ row: r, q: q.get(lower(r.company)) })).filter((x) => x.q);
+      const zRow = state.z.minRow;
+
+      /* --- оценки: отдельный рейтинг в каждом магазине --- */
+      const allQ = [{ q: zQ, me: true, region: zRow ? zRow.region : "Казахстан" }]
+        .concat(companies.map((c) => ({ q: c.q, me: false, region: c.row.region })));
+      const rankBy = (key) => allQ.filter((x) => Number.isFinite(x.q[key])).sort((a, b) => b.q[key] - a.q[key]);
+      const asRows = rankBy("rating");
+      const gpRows = rankBy("ratingGp");
+
+
+      /* карточки превосходства по числовым метрикам */
+      const cards = [];
+      if (Number.isFinite(zQ.rating)) {
+        const rated = companies.filter((c) => Number.isFinite(c.q.rating));
+        const better = rated.filter((c) => zQ.rating > c.q.rating).length;
+        let chip = ["", "нет данных по конкурентам"];
+        if (rated.length) {
+          const tone = better === rated.length ? "good" : (better * 2 >= rated.length ? "good" : "hot");
+          chip = [tone, better === rated.length ? "выше, чем у всех" : "выше, чем у " + better + " из " + rated.length];
+        }
+        cards.push({
+          accent: true,
+          label: "Оценка в App Store",
+          value: nf(zQ.rating, 1) + " \u2605",
+          chip,
+          note: (Number.isFinite(zQ.ratings) ? nf(zQ.ratings) + " " + plural(zQ.ratings, "оценка", "оценки", "оценок") : "")
+            + (Number.isFinite(zQ.ratingGp)
+                ? " · Google Play — " + nf(zQ.ratingGp, 1) + " ★"
+                  + (Number.isFinite(zQ.ratingsGp) ? " (" + nf(zQ.ratingsGp) + ")" : "")
+                : ""),
+        });
+      }
+      [["tasks", "Вопросов и заданий"]].forEach(([key, label]) => {
+        if (!Number.isFinite(zQ[key])) return;
+        const rated = companies.filter((c) => Number.isFinite(c.q[key]));
+        const ahead = rated.filter((c) => c.q[key] > zQ[key]);
+        const leader = ahead.slice().sort((a, b) => b.q[key] - a.q[key])[0];
+        const total = rated.length + 1;
+        cards.push({
+          accent: true, label,
+          value: nf(zQ[key]),
+          chip: rated.length
+            ? (ahead.length === 0 ? ["good", "больше всех, кто публикует"] : ["", (ahead.length + 1) + "-е место из " + total])
+            : ["brand", "нет данных по конкурентам"],
+          note: rated.length
+            ? (leader ? "впереди только " + leader.q.company + " — " + nf(leader.q[key]) : "среди " + total + " компаний, публикующих объём")
+            : "заполните колонку у конкурентов, чтобы увидеть сравнение",
+        });
+      });
+      if (zQ.languages) {
+        const kzRivals = companies.filter((c) => lower(c.q.languages).includes("каз")).length;
+        const weHaveKz = lower(zQ.languages).includes("каз");
+        cards.push({
+          label: "Языки интерфейса", value: zQ.languages,
+          chip: weHaveKz
+            ? (kzRivals ? ["", "казахский есть ещё у " + kzRivals] : ["good", "казахский только у нас"])
+            : ["", "по данным листа Quality"],
+          note: kzRivals || !weHaveKz ? "казахский язык у " + (kzRivals + (weHaveKz ? 1 : 0)) + " из " + (companies.length + 1) + " компаний" : "остальные — без казахского языка",
+        });
+      }
+
+      let tilesHtml = "";
+      if (cards.length) {
+        tilesHtml += '<section class="kpis" style="grid-template-columns:repeat(' + Math.min(4, cards.length) + ',minmax(0,1fr))">' + cards.map((c) => (
+          '<article class="kpi' + (c.accent ? " accent" : "") + '">' +
+          '<div class="kpi-label">' + esc(c.label) + "</div>" +
+          '<div class="kpi-value num" style="font-size:' + (String(c.value).length > 10 ? 18 : 27) + 'px">' + esc(c.value) + "</div>" +
+          '<div class="kpi-foot"><span class="chip ' + c.chip[0] + '">' + esc(c.chip[1]) + "</span></div>" +
+          '<div class="kpi-note">' + esc(c.note) + "</div>" +
+          "</article>"
+        )).join("") + "</section>";
+      }
+
+      const hasTasks = Number.isFinite(zQ.tasks) || companies.some((c) => Number.isFinite(c.q.tasks));
+      const BREAKDOWN = [["tasks", "Вопросы"], ["cards", "Карточки"], ["tests", "Тесты и квизы"], ["challenges", "Челленджи"], ["lessons", "Тренинги"]];
+      const breakdown = BREAKDOWN.filter(([k]) => Number.isFinite(zQ[k]));
+      if (breakdown.length) {
+        tilesHtml += '<article class="card" style="margin-top:14px"><div class="card-head">' +
+          '<h3 class="card-title">Из чего состоит Зерделі</h3>' +
+          '<div class="card-sub">Такой разбивки по типам контента конкуренты не публикуют</div></div><div class="tiles">' +
+          breakdown.slice().sort((a, b) => zQ[b[0]] - zQ[a[0]]).map(([k, label]) => (
+            '<div class="tile"><div class="tile-val num">' + nf(zQ[k]) + '</div><div class="tile-lab">' + esc(label.toLowerCase()) + "</div></div>"
+          )).join("") + "</div></article>";
+      }
+
+      const placeNote = (rows) => {
+        const i = rows.findIndex((x) => x.me);
+        return i < 0 ? "Шкала от 0 до 5" : "Шкала от 0 до 5 · Зерделі — " + (i + 1) + "-е место из " + rows.length;
+      };
+      put("qualityTiles", tilesHtml);
+
+      let ratingHtml = '<div class="grid-2">';
+      ratingHtml += '<article class="card"><div class="card-head"><h3 class="card-title">App Store</h3>' +
+        '<div class="card-sub">' + esc(placeNote(asRows)) + "</div></div>" +
+        (asRows.length > 1 ? '<div class="chart-box" id="asBox"><canvas id="asChart"></canvas></div>'
+                           : '<div class="empty">Нет оценок для сравнения</div>') + "</article>";
+      ratingHtml += '<article class="card"><div class="card-head"><h3 class="card-title">Google Play</h3>' +
+        '<div class="card-sub">' + esc(placeNote(gpRows)) + "</div></div>" +
+        (gpRows.length > 1 ? '<div class="chart-box" id="gpBox"><canvas id="gpChart"></canvas></div>'
+                           : '<div class="empty">Нет оценок для сравнения</div>') + "</article>";
+      ratingHtml += "</div>";
+      put("ratingCards", ratingHtml);
+
+      /* --- охват: подписчики и установки --- */
+      const igRows = allQ.filter((x) => Number.isFinite(x.q.instagram)).sort((a, b) => b.q.instagram - a.q.instagram);
+      const ageRows = allQ.filter((x) => Number.isFinite(x.q.founded)).sort((a, b) => a.q.founded - b.q.founded);
+      const inRows = allQ.filter((x) => Number.isFinite(x.q.installs)).sort((a, b) => b.q.installs - a.q.installs);
+      let reachHtml = "";
+      if (ageRows.length > 1 || igRows.length > 1 || inRows.length > 1) {
+        reachHtml += '<div class="grid-3">';
+        if (ageRows.length > 1) {
+          reachHtml += '<article class="card"><div class="card-head"><h3 class="card-title">Кто когда вышел на рынок</h3>' +
+            '<div class="card-sub">Полоса тянется от года выхода до сегодня</div></div>' +
+            '<div class="chart-box" id="ageBox"><canvas id="ageChart"></canvas></div></article>';
+        }
+        if (igRows.length > 1) {
+          reachHtml += '<article class="card"><div class="card-head"><h3 class="card-title">Подписчики в Instagram</h3>' +
+            '<div class="card-sub">' + esc(placeNote(igRows).replace("Шкала от 0 до 5 · ", "")) + "</div></div>" +
+            '<div class="chart-box" id="igBox"><canvas id="igChart"></canvas></div></article>';
+        }
+        if (inRows.length > 1) {
+          reachHtml += '<article class="card"><div class="card-head"><h3 class="card-title">Установки в Google Play</h3>' +
+            '<div class="card-sub">Магазин показывает порог, а не точное число: «10 тыс.+» значит «не меньше 10 000». Внутри одного порога ранжировать нельзя</div></div>' +
+            '<div class="chart-box" id="inBox"><canvas id="inChart"></canvas></div></article>';
+        }
+        reachHtml += "</div>";
+      }
+      put("reachCards", reachHtml);
+
+      let tasksHtml = "";
+      const zNoTasks = hasTasks && !Number.isFinite(zQ.tasks);
+      tasksHtml += '<article class="card" style="margin-top:14px"><div class="card-head"><h3 class="card-title">Сколько задач в продукте</h3>' +
+        '<div class="card-sub">' + (zNoTasks
+          ? "У Зерделі колонка Tasks не заполнена — добавьте число, чтобы попасть на график"
+          : "Вопросов и заданий — у тех компаний, которые публикуют объём") + "</div></div>" +
+        (hasTasks ? '<div class="chart-box" id="tasksBox"><canvas id="tasksChart"></canvas></div>'
+                  : '<div class="empty">Нет данных об объёме материала</div>') + "</article>";
+      put("tasksCard", tasksHtml);
+
+      const tableRows = [{ row: zRow, q: zQ, me: true }].concat(companies.map((c) => ({ row: c.row, q: c.q, me: false })));
+
+      /* Колонки таблицы: описываем один раз, отсюда же строятся заголовки, ячейки и сортировка */
+      const COLS = [
+        { key: "company", label: "Компания", type: "text", get: (q) => q.company },
+        { key: "tasks", label: "Вопросов", type: "num", right: true, get: (q) => q.tasks, cell: (q) => (Number.isFinite(q.tasks) ? nf(q.tasks) : "—") },
+        { key: "lessons", label: "Уроков", type: "num", right: true, get: (q) => q.lessons, cell: (q) => (Number.isFinite(q.lessons) ? nf(q.lessons) : "—") },
+        { key: "rating", label: "App Store", type: "num", right: true, get: (q) => q.rating,
+          cell: (q) => (Number.isFinite(q.rating) ? nf(q.rating, 1) + " \u2605" + (Number.isFinite(q.ratings) ? " (" + nf(q.ratings) + ")" : "") : "—") },
+        { key: "ratingGp", label: "Google Play", type: "num", right: true, get: (q) => q.ratingGp,
+          cell: (q) => (Number.isFinite(q.ratingGp) ? nf(q.ratingGp, 1) + " ★" + (Number.isFinite(q.ratingsGp) ? " (" + nf(q.ratingsGp) + ")" : "") : "—") },
+        { key: "instagram", label: "Подписчики", type: "num", right: true, get: (q) => q.instagram, cell: (q) => (Number.isFinite(q.instagram) ? nf(q.instagram) : "—") },
+        { key: "installs", label: "Скачивания", type: "num", right: true, get: (q) => q.installs, cell: (q) => (Number.isFinite(q.installs) ? nf(q.installs) + "+" : "—") },
+        { key: "languages", label: "Языки", type: "text", get: (q) => q.languages, cell: (q) => esc(q.languages || "—") },
+        { key: "founded", label: "На рынке с", type: "num", right: true, get: (q) => q.founded, cell: (q) => (Number.isFinite(q.founded) ? q.founded : "—") },
+        { key: "ig", label: "Instagram", type: "text", get: (q) => q.ig,
+          cell: (q) => (q.ig
+            ? '<a class="ig-link" href="https://www.instagram.com/' + encodeURIComponent(q.ig) + '/" target="_blank" rel="noopener noreferrer">@' + esc(q.ig) + "</a>"
+            : "—") },
+      ].filter((c) => c.key === "company" || tableRows.some((x) => {
+        const v = c.get(x.q);
+        return c.type === "num" ? Number.isFinite(v) : !!v;
+      }));
+
+      /* Сортировка по нажатию на заголовок; пустые значения всегда внизу */
+      const sortState = state.qSort;
+      let ordered = tableRows;
+      if (sortState && COLS.some((c) => c.key === sortState.key)) {
+        const col = COLS.find((c) => c.key === sortState.key);
+        const dir = sortState.dir === "asc" ? 1 : -1;
+        const empty = (v) => v === null || v === undefined || v === "" || (col.type === "num" && !Number.isFinite(v));
+        ordered = tableRows.slice().sort((a, b) => {
+          const va = col.get(a.q), vb = col.get(b.q);
+          if (empty(va) && empty(vb)) return 0;
+          if (empty(va)) return 1;
+          if (empty(vb)) return -1;
+          return (col.type === "num" ? va - vb : String(va).localeCompare(String(vb), "ru")) * dir;
+        });
+      }
+
+      let tableHtml = '<article class="card"><div class="card-head"><h3 class="card-title">Сводная таблица</h3>' +
+        '<div class="card-sub">Нажмите на заголовок столбца, чтобы отсортировать. Пустые колонки скрыты</div></div><div class="table-wrap"><table>' +
+        "<thead><tr>" + COLS.map((c) => {
+          const active = sortState && sortState.key === c.key;
+          const arrow = active ? (sortState.dir === "asc" ? " ↑" : " ↓") : "";
+          return '<th class="sortable' + (c.right ? " right" : "") + (active ? " sorted" : "") + '" data-sort="' + c.key + '">' + esc(c.label) + arrow + "</th>";
+        }).join("") + "</tr></thead><tbody>";
+
+      tableHtml += ordered.map((x) => (
+        "<tr" + (x.me ? ' class="me"' : "") + ">" +
+        COLS.map((c) => '<td class="' + (c.right ? "right num" : "") + '">' + (c.cell ? c.cell(x.q) : esc(c.get(x.q) || "—")) + "</td>").join("") +
+        "</tr>"
+      )).join("");
+      tableHtml += "</tbody></table></div></article>";
+      put("qualityTable", tableHtml);
+
+      /* один и тот же вид для обоих магазинов — сравнивать проще, когда форма одинаковая */
+      const ratingChart = (key, boxId, canvasId, rows, chartKey) => {
+        if (rows.length < 2 || !$("#" + boxId)) return;
+        const p = palette();
+        $("#" + boxId).style.height = Math.max(230, rows.length * 32 + 56) + "px";
+        const boxW = $("#" + boxId).clientWidth || 520;
+        mount(chartKey, canvasId, {
+          type: "bar",
+          data: {
+            labels: rows.map((x) => (x.me ? "Зерделі" : short(x.q.company, 16))),
+            datasets: [{
+              data: rows.map((x) => x.q[key]),
+              backgroundColor: rows.map((x) => barColor(p, x.me, x.region)),
+              barThickness: 2,
+              borderSkipped: false,
+            }],
+          },
+          options: {
+            ...baseOptions(p),
+            indexAxis: "y",
+            layout: { padding: { right: 34 } },
+            plugins: {
+              ...baseOptions(p).plugins,
+              dots: {
+                items: rows.map((x, i) => ({ index: i, value: x.q[key], r: 6, color: barColor(p, x.me, x.region), ring: p.card })),
+              },
+              barLabels: { digits: 1, color: p.soft, meColor: p.brand, meIndex: rows.findIndex((x) => x.me) },
+              tooltip: {
+                ...baseOptions(p).plugins.tooltip,
+                callbacks: {
+                  title: (items) => rows[items[0].dataIndex].q.company,
+                  label: (ctx) => {
+                    const q = rows[ctx.dataIndex].q;
+                    const count = key === "rating" ? q.ratings : q.ratingsGp;
+                    return nf(ctx.raw, 1) + " из 5"
+                      + (Number.isFinite(count) ? " · " + nf(count) + " " + plural(count, "оценка", "оценки", "оценок") : "");
+                  },
+                },
+              },
+            },
+            scales: {
+              x: { min: 0, max: 5, grid: { color: p.grid }, border: { display: false }, ticks: { color: p.soft, stepSize: 1, font: { size: 11.5 } } },
+              y: {
+                grid: { display: false }, border: { display: false },
+                afterFit: (scale) => { scale.width = Math.min(scale.width, boxW * 0.44); },
+                ticks: {
+                  color: p.text, autoSkip: false, padding: 4,
+                  font: (ctx) => ({ size: 12, weight: rows[ctx.index] && rows[ctx.index].me ? "800" : "600" }),
+                },
+              },
+            },
+          },
+        });
+      };
+      ratingChart("rating", "asBox", "asChart", asRows, "storesAs");
+      ratingChart("ratingGp", "gpBox", "gpChart", gpRows, "storesGp");
+
+      /* охват: те же правила — одна серия, наша полоса выделена, значения подписаны */
+      const reachChart = (key, boxId, canvasId, rows, chartKey, suffix, padRight) => {
+        if (rows.length < 2 || !$("#" + boxId)) return;
+        const p = palette();
+        $("#" + boxId).style.height = Math.max(230, rows.length * 34 + 56) + "px";
+        const boxW = $("#" + boxId).clientWidth || 520;
+        mount(chartKey, canvasId, {
+          type: "bar",
+          data: {
+            labels: rows.map((x) => (x.me ? "Зерделі" : short(x.q.company, 16))),
+            datasets: [{
+              data: rows.map((x) => x.q[key]),
+              backgroundColor: rows.map((x) => barColor(p, x.me, x.region)),
+              borderRadius: 5,
+              barPercentage: 0.66,
+            }],
+          },
+          options: {
+            ...baseOptions(p),
+            indexAxis: "y",
+            layout: { padding: { right: padRight } },
+            plugins: {
+              ...baseOptions(p).plugins,
+              barLabels: { digits: 0, suffix, color: p.soft, meColor: p.brand, meIndex: rows.findIndex((x) => x.me) },
+              tooltip: {
+                ...baseOptions(p).plugins.tooltip,
+                callbacks: {
+                  title: (items) => rows[items[0].dataIndex].q.company,
+                  label: (ctx) => nf(ctx.raw) + suffix,
+                },
+              },
+            },
+            scales: {
+              x: { grid: { color: p.grid }, border: { display: false }, ticks: { color: p.soft, font: { size: 11.5 }, maxTicksLimit: 6, maxRotation: 0, callback: (v) => nf(v) } },
+              y: {
+                grid: { display: false }, border: { display: false },
+                afterFit: (scale) => { scale.width = Math.min(scale.width, boxW * 0.44); },
+                ticks: {
+                  color: p.text, autoSkip: false, padding: 4,
+                  font: (ctx) => ({ size: 12, weight: rows[ctx.index] && rows[ctx.index].me ? "800" : "600" }),
+                },
+              },
+            },
+          },
+        });
+      };
+      reachChart("instagram", "igBox", "igChart", igRows, "reachIg", "", 62);
+      reachChart("installs", "inBox", "inChart", inRows, "reachIn", "+", 70);
+
+      /* возраст: длина полосы — сколько лет на рынке, подпись — год выхода */
+      if (ageRows.length > 1 && $("#ageBox")) {
+        const p = palette();
+        const thisYear = state.loadedAt ? state.loadedAt.getFullYear() : 2026;
+        $("#ageBox").style.height = Math.max(230, ageRows.length * 30 + 56) + "px";
+        const boxW = $("#ageBox").clientWidth || 420;
+        mount("age", "ageChart", {
+          type: "bar",
+          data: {
+            labels: ageRows.map((x) => (x.me ? "Зерделі" : short(x.q.company, 14))),
+            datasets: [{
+              data: ageRows.map((x) => [x.q.founded, thisYear]),
+              backgroundColor: ageRows.map((x) => barColor(p, x.me, x.region)),
+              barThickness: 2,
+              borderSkipped: false,
+            }],
+          },
+          options: {
+            ...baseOptions(p),
+            indexAxis: "y",
+            layout: { padding: { left: 4, right: 14 } },
+            plugins: {
+              ...baseOptions(p).plugins,
+              dots: {
+                items: ageRows.map((x, i) => ({ index: i, value: x.q.founded, r: 6, color: barColor(p, x.me, x.region), ring: p.card })),
+              },
+              barLabels: { digits: 0, asYear: true, atStart: true, color: p.soft, meColor: p.brand, meIndex: ageRows.findIndex((x) => x.me) },
+              tooltip: {
+                ...baseOptions(p).plugins.tooltip,
+                callbacks: {
+                  title: (items) => ageRows[items[0].dataIndex].q.company,
+                  label: (ctx) => {
+                    const y = ageRows[ctx.dataIndex].q.founded;
+                    const n = Math.max(0, thisYear - y);
+                    return "на рынке с " + y + " — " + n + " " + plural(n, "год", "года", "лет");
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                min: Math.min(...ageRows.map((x) => x.q.founded)) - 4,
+                max: thisYear,
+                grid: { color: p.grid }, border: { display: false },
+                ticks: { color: p.soft, font: { size: 11.5 }, maxTicksLimit: 5, precision: 0, callback: (v) => String(Math.round(v)) },
+              },
+              y: {
+                grid: { display: false }, border: { display: false },
+                afterFit: (scale) => { scale.width = Math.min(scale.width, boxW * 0.46); },
+                ticks: {
+                  color: p.text, autoSkip: false, padding: 4,
+                  font: (ctx) => ({ size: 11.5, weight: ageRows[ctx.index] && ageRows[ctx.index].me ? "800" : "600" }),
+                },
+              },
+            },
+          },
+        });
+
+      }
+
+      if (hasTasks) {
+        const p = palette();
+        const rows = [{ name: "Зерделі", value: zQ.tasks, me: true, region: zRow ? zRow.region : "Казахстан" }]
+          .concat(companies.map((c) => ({ name: c.q.company, value: c.q.tasks, me: false, region: c.row.region })))
+          .filter((r) => Number.isFinite(r.value))
+          .sort((a, b) => b.value - a.value);
+        $("#tasksBox").style.height = Math.max(240, rows.length * 34 + 56) + "px";
+        const boxW = $("#tasksBox").clientWidth || 600;
+        mount("tasks", "tasksChart", {
+          type: "bar",
+          data: {
+            labels: rows.map((r) => short(r.name, 18)),
+            datasets: [{
+              data: rows.map((r) => r.value),
+              backgroundColor: rows.map((r) => barColor(p, r.me, r.region)),
+              borderRadius: 6,
+              barPercentage: 0.62,
+            }],
+          },
+          options: {
+            ...baseOptions(p),
+            indexAxis: "y",
+            layout: { padding: { right: 62 } },
+            plugins: {
+              ...baseOptions(p).plugins,
+              barLabels: { digits: 0, color: p.soft, meColor: p.brand, meIndex: rows.findIndex((r) => r.me) },
+              tooltip: {
+                ...baseOptions(p).plugins.tooltip,
+                callbacks: { label: (ctx) => nf(ctx.raw) + " задач" },
+              },
+            },
+            scales: {
+              x: { grid: { color: p.grid }, border: { display: false }, ticks: { color: p.soft, font: { size: 11.5 }, callback: (v) => nf(v) } },
+              y: {
+                grid: { display: false }, border: { display: false },
+                afterFit: (scale) => { scale.width = Math.min(scale.width, boxW * 0.46); },
+                ticks: { color: p.text, autoSkip: false, padding: 2, font: (ctx) => ({ size: 12, weight: rows[ctx.index] && rows[ctx.index].me ? "800" : "600" }) },
+              },
+            },
+          },
+        });
+      }
+    }
+
+    /* пока листа Quality нет — показываем, что уже известно, и как включить сравнение */
+    function qualitySetupHtml() {
+      const zRow = state.z.minRow;
+      const rows = (zRow ? [zRow] : []).concat(companyRows(state.rivals).sort((a, b) => a.company.localeCompare(b.company, "ru")));
+      const table = '<article class="card"><div class="card-head"><h3 class="card-title">Что известно сейчас</h3>' +
+        '<div class="card-sub">Формат, охват классов и предметы — из листа Raw_Prices</div></div>' +
+        '<div class="table-wrap"><table><thead><tr><th>Компания</th><th>Формат</th><th>Классы</th><th>Предметы</th></tr></thead><tbody>' +
+        rows.map((r) => (
+          "<tr" + (r.isZ ? ' class="me"' : "") + "><td>" + esc(r.company) + "</td>" +
+          '<td class="wrapcell">' + esc(r.format || "—") + "</td>" +
+          "<td>" + esc(r.grades || "—") + "</td>" +
+          '<td class="wrapcell">' + esc(r.subjects || "—") + "</td></tr>"
+        )).join("") + "</tbody></table></div></article>";
+
+      return table;
+    }
+
+    function renderFeatures() {
+      const p = palette();
+      const rows = companyRows(state.rivals);
+      const zBest = state.z.rows.slice().sort((a, b) => b.score - a.score)[0];
+      const all = (zBest ? [zBest] : []).concat(rows.slice().sort((a, b) => b.score - a.score || a.price - b.price));
+
+      /* matrix */
+      const head = "<thead><tr><th>Компания</th>" + FEATURES.map(([, , s]) => '<th class="center">' + esc(s) + "</th>").join("") + "</tr></thead>";
+      const body = all.map((r) => (
+        "<tr" + (r.isZ ? ' class="me"' : "") + "><td>" + esc(r.company) + "</td>" +
+        FEATURES.map(([k]) => '<td class="center ' + (r[k] ? "yes" : "no") + '">' + (r[k] ? "✓" : "—") + "</td>").join("") + "</tr>"
+      )).join("");
+      $("#featureTable").innerHTML = head + "<tbody>" + body + "</tbody>";
+    }
+
+    function renderH2H() {
+      const z = state.z.min;
+      const rows = cheapestRows(state.rivals);
+      rows.sort((a, b) => {
+        const at = a.type === state.z.type ? 0 : 1, bt = b.type === state.z.type ? 0 : 1;
+        if (at !== bt) return at - bt;
+        const ar = a.region === "Казахстан" ? 0 : 1, br = b.region === "Казахстан" ? 0 : 1;
+        if (ar !== br) return ar - br;
+        return Math.abs(a.price - z) - Math.abs(b.price - z);
+      });
+      const more = $("#moreRivals");
+      if (!rows.length) {
+        $("#h2hGrid").innerHTML = '<div class="empty">Под текущий фильтр конкуренты не найдены</div>';
+        more.hidden = true;
+        return;
+      }
+
+      const LIMIT = 6;
+      const shown = state.showAllRivals ? rows : rows.slice(0, LIMIT);
+      const zOrig = origLabel(state.z.minRow);
+
+      $("#h2hGrid").innerHTML = shown.map((r) => {
+        /* масштаб внутри строки — чтобы разница читалась и у дешёвых тарифов */
+        const maxPrice = Math.max(z, r.price) || 1;
+        const d = deltaInfo(r.price);
+        const theirs = FEATURES.filter(([k]) => r[k] && !state.z.features[k]).map(([, n]) => n);
+        const ours = FEATURES.filter(([k]) => state.z.features[k] && !r[k]).map(([, n]) => n);
+        const direct = r.type === state.z.type;
+        const kzDirect = direct && r.region === "Казахстан";
+        const orig = origLabel(r);
+        return (
+          '<div class="vs-row' + (direct ? " direct" : "") + '">' +
+            "<div>" +
+              '<div class="vs-co">' + esc(r.company) +
+                '<span class="chip' + (kzDirect ? " brand" : "") + '">' + esc(kzDirect ? "прямой конкурент" : (direct ? "та же категория" : r.type)) + "</span>" +
+                '<span class="chip">' + esc(r.region) + "</span>" +
+                (r.grades ? '<span class="chip">классы ' + esc(r.grades) + "</span>" : "") +
+              "</div>" +
+              '<div class="vs-prod">' + esc(short(r.product, 52)) + (orig ? " · покупка: " + esc(orig) : "") + "</div>" +
+              '<div class="vs-pair">' +
+                '<span class="who">Зерделі</span><span class="bar-track"><span class="bar-fill me" style="width:' + (z / maxPrice * 100) + '%"></span></span>' +
+                '<span class="who">' + esc(short(r.company, 12)) + '</span><span class="bar-track"><span class="bar-fill" style="width:' + (r.price / maxPrice * 100) + '%"></span></span>' +
+              "</div>" +
+              '<div class="vs-feats">' +
+                (theirs.length
+                  ? '<span class="feat-key">у нас нет</span>' + theirs.map((n) => '<span class="feat minus">' + esc(n) + "</span>").join("")
+                  : '<span class="feat same">по функциям не уступаем</span>') +
+                (ours.length ? '<span class="feat-key" style="margin-left:6px">только у нас</span>' + ours.map((n) => '<span class="feat plus">' + esc(n) + "</span>").join("") : "") +
+              "</div>" +
+            "</div>" +
+            '<div class="vs-side">' +
+              '<div class="p num">' + money(r.price) + "</div>" +
+              '<div class="u">в месяц</div>' +
+              '<span class="chip ' + (d.tone === "hot" ? "hot" : "good") + '">' + esc(d.text) + "</span>" +
+            "</div>" +
+          "</div>"
+        );
+      }).join("");
+
+      void zOrig;
+      const rest = rows.length - shown.length;
+      more.hidden = rows.length <= LIMIT;
+      more.textContent = state.showAllRivals ? "Свернуть до " + LIMIT : "Показать ещё " + rest + " " + plural(rest, "компанию", "компании", "компаний");
+    }
+
+    function plural(n, one, few, many) {
+      const a = Math.abs(n) % 100, b = a % 10;
+      if (a > 10 && a < 20) return many;
+      if (b > 1 && b < 5) return few;
+      if (b === 1) return one;
+      return many;
+    }
+
+    function renderTable() {
+      const rows = state.view;
+      const head = "<thead><tr>" +
+        "<th>Компания</th><th>Продукт</th><th>Тип</th><th>Регион</th><th>Классы</th>" +
+        '<th class="right">Реальная цена покупки</th><th class="right">₸ в месяц</th><th class="right">Разница с Зерделі</th><th class="center">Функций</th>' +
+        "</tr></thead>";
+      const body = rows.map((r) => {
+        const d = deltaInfo(r.price);
+        const orig = origLabel(r);
+        return "<tr" + (r.isZ ? ' class="me"' : "") + ">" +
+          "<td>" + esc(r.company) + "</td>" +
+          '<td class="wrapcell">' + esc(r.product) + "</td>" +
+          "<td>" + esc(r.type) + "</td>" +
+          "<td>" + esc(r.region) + "</td>" +
+          "<td>" + esc(r.grades || "—") + "</td>" +
+          '<td class="right soft">' + esc(orig || money(r.price) + " за месяц") + "</td>" +
+          '<td class="right num">' + money(r.price) + "</td>" +
+          '<td class="right">' + (r.isZ ? '<span class="chip brand">наш тариф</span>' : '<span class="chip ' + (d.tone || "") + '">' + esc(d.text) + "</span>") + "</td>" +
+          '<td class="center num">' + r.score + "</td>" +
+          "</tr>";
+      }).join("");
+      $("#dataTable").innerHTML = head + "<tbody>" + (body || '<tr><td colspan="9" class="empty">Ничего не найдено</td></tr>') + "</tbody>";
+      $("#tableCount").textContent = rows.length + " " + plural(rows.length, "строка", "строки", "строк");
+    }
+
+    /* ---------------- export ---------------- */
+    function exportCsv() {
+      const header = ["Компания", "Продукт", "Тип", "Регион", "Классы", "Реальная_цена_покупки", "KZT_в_месяц", "Разница_с_Зерделі", "Функций_из_5"];
+      const lines = [header.join(";")].concat(state.view.map((r) => {
+        const d = deltaInfo(r.price);
+        return [r.company, r.product, r.type, r.region, r.grades, origLabel(r) || money(r.price) + " за месяц", Math.round(r.price), r.isZ ? "наш тариф" : d.text, r.score]
+          .map((v) => '"' + String(v ?? "").replace(/"/g, '""') + '"').join(";");
+      }));
+      const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "zerdeli_vs_market.csv";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast("Файл сохранён", "zerdeli_vs_market.csv — текущая выборка сравнения.");
+    }
+
+    /* ---------------- events ---------------- */
+    $("#qualityTable").addEventListener("click", (e) => {
+      const th = e.target.closest("th[data-sort]");
+      if (!th) return;
+      const key = th.dataset.sort;
+      const cur = state.qSort;
+      const numeric = th.classList.contains("right");
+      state.qSort = cur && cur.key === key
+        ? { key, dir: cur.dir === "asc" ? "desc" : "asc" }
+        : { key, dir: numeric ? "desc" : "asc" };
+      renderQuality();
+    });
+
+    $("#moreRivals").addEventListener("click", () => {
+      state.showAllRivals = !state.showAllRivals;
+      renderH2H();
+    });
+
+    $("#tableFold").addEventListener("toggle", () => {
+      if ($("#tableFold").open) Object.values(charts).forEach((c) => c.resize());
+    });
+
+    ["#query", "#ptype", "#region", "#sortBy"].forEach((sel) => {
+      const el = $(sel);
+      el.addEventListener(el.tagName === "SELECT" ? "change" : "input", apply);
+    });
+
+    $("#filterToggle").addEventListener("click", () => {
+      const panel = $("#controlsPanel");
+      const open = panel.hidden;
+      panel.hidden = !open;
+      $("#filterToggle").setAttribute("aria-expanded", String(open));
+      if (open) $("#query").focus();
+    });
+
+    $("#resetBtn").addEventListener("click", () => {
+      $("#query").value = ""; $("#ptype").value = ""; $("#region").value = ""; $("#sortBy").value = "priceAsc";
+      apply();
+    });
+    $("#refreshBtn").addEventListener("click", () => load(true));
+    $("#downloadBtn").addEventListener("click", exportCsv);
+    $("#themeBtn").addEventListener("click", () => {
+      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem("zerdeli-vs-market-theme", next);
+      if (state.base.length) render();
+    });
+
+    load(false);
+    setInterval(() => load(false), REFRESH_MS);
+  </script>
+</body>
+</html>
