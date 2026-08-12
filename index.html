@@ -198,6 +198,20 @@
     .grid-2.wide-right { grid-template-columns: 1fr 1.18fr; }
     .grid-2.quality-grid { grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr); }
 
+    /* ---------- аргументы ---------- */
+    .claims { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .claim {
+      display: flex; flex-direction: column;
+      padding: 20px 22px; border: 1px solid var(--line); border-radius: 16px;
+      background: var(--card); box-shadow: var(--shadow);
+    }
+    .claim.lead { border-color: var(--brand); background: linear-gradient(180deg, var(--brand-soft), var(--card) 60%); }
+    .claim-val { font-size: 30px; font-weight: 800; letter-spacing: -.03em; line-height: 1.05; color: var(--brand); }
+    .claim-val.small { font-size: 22px; }
+    .claim-title { margin-top: 10px; font-size: 14.5px; font-weight: 700; line-height: 1.4; }
+    .claim-proof { margin-top: auto; padding-top: 12px; color: var(--soft); font-size: 12px; line-height: 1.5; }
+    .claim-proof b { color: var(--ink); font-weight: 700; }
+
     /* ---------- kpi ---------- */
     .kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     .kpi { border: 1px solid var(--line); border-radius: 14px; background: var(--card); box-shadow: var(--shadow); padding: 15px 16px; }
@@ -305,6 +319,7 @@
       .vs-div { width: auto; height: 1px; }
       .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .claims { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .grid-2, .grid-3, .grid-2.wide-right, .grid-2.quality-grid { grid-template-columns: 1fr; }
       .vs-row { grid-template-columns: 1fr; gap: 10px; }
       .vs-side { text-align: left; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
@@ -314,6 +329,7 @@
       h1 { font-size: 20px; }
       .kpis { grid-template-columns: 1fr; }
       .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .claims { grid-template-columns: 1fr; }
       .vs-price { font-size: 26px; }
       .field .ctl { min-width: 100%; }
       .field { width: 100%; }
@@ -406,6 +422,14 @@
     </section>
 
     <main>
+      <!-- ГЛАВНОЕ: аргументы для родителя -->
+      <div class="sec-head">
+        <div class="sec-kicker">Главное</div>
+        <h2>Чем Зерделі отличается — коротко</h2>
+        <div class="sec-note">Каждое отличие проверяемо: под ним указано, с кем сравнили и какие у конкурента цифры.</div>
+      </div>
+      <div class="claims" id="claimsBox"></div>
+
       <!-- ШАГ 1. ЦЕНА -->
       <div class="sec-head">
         <div class="sec-kicker">Шаг 1 · Цена</div>
@@ -922,6 +946,7 @@
     /* ---------------- render ---------------- */
     function render() {
       renderVerdict();
+      renderClaims();
       renderKpis();
       renderPriceMap();
       renderRangeChart();
@@ -930,6 +955,104 @@
       renderQuality();
       renderSameFeatures();
       renderTable();
+    }
+
+    /* Конкретные отличия для родителя: каждое считается из данных,
+       чтобы не устареть молча, и называет конкурента поимённо. */
+    function renderClaims() {
+      const box = $("#claimsBox");
+      if (!box) return;
+      const z = state.z.min;
+      const zRow = state.z.minRow;
+      const rival = directRival();
+      const q = state.quality;
+      const qOf = (name) => (q ? q.get(lower(name)) : null);
+      const zQ = qOf("zerdeli app") || (q ? [...q.values()].find((v) => lower(v.company).includes("zerdeli")) : null);
+      const kzNames = [...new Set(state.rivals.filter((r) => isKz(r.region)).map((r) => r.company))];
+      const kz = kzNames.map((name) => state.rivals.find((r) => r.company === name));
+      const claims = [];
+
+      /* 1. Сколько семья экономит за год против прямого конкурента */
+      if (rival && Number.isFinite(z) && rival.price > z) {
+        claims.push({
+          lead: true,
+          value: money((rival.price - z) * 12),
+          title: "Столько семья экономит за год против " + rival.company,
+          proof: money(z) + " в месяц против " + money(rival.price) + " — дешевле в <b>" + nf(rival.price / z, 1) + " раза</b>",
+        });
+      }
+
+      /* 2. Сколько предметов входит в одну подписку */
+      const subjects = String(zRow && zRow.subjects || "").split(/[;,]/).map((x) => x.trim()).filter(Boolean);
+      if (subjects.length > 1) {
+        const rivalFirst = rival ? String(rival.subjects || "").split(/[;,]/)[0].trim() : "";
+        claims.push({
+          value: subjects.join(" и "),
+          small: true,
+          title: "Два предмета в одной подписке, без доплаты",
+          proof: rivalFirst
+            ? "у " + rival.company + " за те же деньги — только " + rivalFirst.toLowerCase()
+            : "конкуренты продают предметы отдельными курсами",
+        });
+      }
+
+      /* 3. Оценка в App Store среди казахстанских */
+      if (zQ && Number.isFinite(zQ.rating)) {
+        const kzRated = kz.map((r) => qOf(r.company)).filter((x) => x && Number.isFinite(x.rating));
+        const worse = kzRated.filter((x) => x.rating < zQ.rating);
+        if (kzRated.length && worse.length === kzRated.length) {
+          claims.push({
+            value: nf(zQ.rating, 1) + " ★",
+            title: "Оценка выше, чем у любого казахстанского приложения",
+            proof: worse.slice(0, 3).map((x) => x.company + " " + nf(x.rating, 1)).join(" · ") + " — App Store",
+          });
+        }
+      }
+
+      /* 4. Объём материала против местных */
+      if (zQ && Number.isFinite(zQ.tasks)) {
+        const kzTasks = kz.map((r) => qOf(r.company)).filter((x) => x && Number.isFinite(x.tasks));
+        const below = kzTasks.filter((x) => x.tasks < zQ.tasks);
+        if (kzTasks.length && below.length === kzTasks.length) {
+          claims.push({
+            value: nf(zQ.tasks),
+            title: "Вопросов больше, чем у любого конкурента в Казахстане",
+            proof: below.slice(0, 2).map((x) => x.company + " — " + nf(x.tasks)).join(", ") + ". Задания не кончатся за месяц",
+          });
+        }
+      }
+
+      /* 5. Охват классов против тех, кто работает только с выпускниками */
+      const zGrades = String(zRow && zRow.grades || "");
+      const narrow = kz.filter((r) => /^1[01]|^10-11/.test(String(r.grades || "")));
+      if (zGrades && narrow.length) {
+        claims.push({
+          value: zGrades.replace("-", "–") + " класс",
+          small: true,
+          title: "Одна подписка на всю школу, а не только на выпускной год",
+          proof: [...new Set(narrow.map((r) => r.company))].slice(0, 3).join(", ") + " работают только с 10–11 классом",
+        });
+      }
+
+      /* 6. Награда, которую ребёнок получает в руки */
+      if (zQ && zQ.extras.some((e) => lower(e).includes("коин"))) {
+        claims.push({
+          value: "Игрушки и мерч",
+          small: true,
+          title: "Ребёнок копит Z-коины за тренинги и меняет их на реальные призы",
+          proof: "у Qalan вознаграждение деньгами на карту — у нас предмет, который остаётся у ребёнка",
+        });
+      }
+
+      box.innerHTML = claims.length
+        ? claims.slice(0, 6).map((c) => (
+            '<article class="claim' + (c.lead ? " lead" : "") + '">' +
+            '<div class="claim-val' + (c.small ? " small" : "") + '">' + esc(c.value) + "</div>" +
+            '<div class="claim-title">' + esc(c.title) + "</div>" +
+            '<div class="claim-proof">' + c.proof + "</div>" +
+            "</article>"
+          )).join("")
+        : '<div class="card empty">Под текущий фильтр отличий не набралось</div>';
     }
 
     function directRival() {
