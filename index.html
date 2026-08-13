@@ -198,6 +198,15 @@
     .grid-2.wide-right { grid-template-columns: 1fr 1.18fr; }
     .grid-2.quality-grid { grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr); }
 
+    .takeaway {
+      margin: 12px 0 0; padding: 12px 16px;
+      border-left: 3px solid var(--brand); border-radius: 0 10px 10px 0;
+      background: var(--brand-soft);
+      font-size: 14px; font-weight: 600; line-height: 1.5;
+    }
+    .takeaway:empty { display: none; }
+    .takeaway b { color: var(--brand); }
+
     /* ---------- отзывы ---------- */
     table.heat th:first-child, table.heat td:first-child { text-align: left; white-space: nowrap; }
     table.heat th { font-size: 10px; }
@@ -449,6 +458,7 @@
         <h2>Чем эти продукты отличаются друг от друга</h2>
         <div class="sec-note">Сравнивать их только по цене нельзя: это три разных типа. Приложение для самостоятельной учёбы, банк тестов и курс с живым преподавателем решают разные задачи и стоят по-разному не потому, что кто-то жадный.</div>
       </div>
+      <div class="takeaway" id="tkProduct"></div>
       <div id="profilesBox"></div>
 
       <!-- ШАГ 2. НАПОЛНЕНИЕ И ФУНКЦИИ -->
@@ -457,6 +467,7 @@
         <h2>Что ученик получает внутри</h2>
         <div class="sec-note" id="qualityNote">Объём материала и набор функций — у тех компаний, которые публикуют данные.</div>
       </div>
+      <div class="takeaway" id="tkContent"></div>
       <div id="qualityTiles"></div>
       <div id="tasksCard"></div>
       <article class="card" style="margin-top:14px">
@@ -473,6 +484,7 @@
         <h2>Как продукт оценивают в магазинах</h2>
         <div class="sec-note">Точка — средняя оценка на шкале от 0 до 5. В скобках у подписи — сколько оценок за ней стоит.</div>
       </div>
+      <div class="takeaway" id="tkReviews"></div>
       <div id="ratingCards"></div>
 
       <article class="card" style="margin-top:14px">
@@ -495,33 +507,18 @@
         <h2>Сколько стоит месяц занятий</h2>
         <div class="sec-note">Все тарифы приведены к одному месяцу. Компании сгруппированы по типу продукта — сравнивать цену имеет смысл внутри группы, а не между ними.</div>
       </div>
+      <div class="takeaway" id="tkPrice"></div>
       <section class="kpis" id="kpiGrid"></section>
       <article class="card" style="margin-top:14px">
         <div class="chart-box" id="mapBox"><canvas id="mapChart"></canvas></div>
       </article>
-      <div class="grid-2 wide-right" style="margin-top:14px">
-        <article class="card">
-          <div class="card-head">
-            <h3 class="card-title">Ценовые коридоры категорий</h3>
-            <div class="card-sub">Полоса — от самого дешёвого до самого дорогого тарифа, точка — медиана</div>
-          </div>
-          <div class="chart-box sm"><canvas id="rangeChart"></canvas></div>
-        </article>
-        <article class="card">
-          <div class="card-head">
-            <h3 class="card-title">Столько же функций — другая цена</h3>
-            <div class="card-sub" id="sameSub">Компании, у которых функций не меньше, чем у Зерделі</div>
-          </div>
-          <div class="chart-box" id="sameBox"><canvas id="sameChart"></canvas></div>
-        </article>
-      </div>
-
       <!-- ШАГ 5. ОХВАТ -->
       <div class="sec-head">
         <div class="sec-kicker">Шаг 5 · Узнаваемость</div>
         <h2>Кто вышел раньше и кого больше знают</h2>
         <div class="sec-note">Возраст продукта во многом объясняет разрыв в аудитории: подписчики и установки копятся годами.</div>
       </div>
+      <div class="takeaway" id="tkReach"></div>
       <div id="reachCards"></div>
 
       <!-- ШАГ 6. ОДИН НА ОДИН -->
@@ -988,13 +985,12 @@
       renderVerdict();
       renderProfiles();
       renderReviews();
+      renderTakeaways();
       renderKpis();
       renderPriceMap();
-      renderRangeChart();
       renderFeatures();   /* до выводов: считает состояние функций для «что это значит» */
       renderH2H();
       renderQuality();
-      renderSameFeatures();
       renderTable();
     }
 
@@ -1182,6 +1178,65 @@
 
       const btn = $("#moreQuotes");
       if (btn) btn.onclick = () => { state.showAllQuotes = !state.showAllQuotes; renderReviews(); };
+    }
+
+    /* Вывод под каждым разделом: одно предложение, посчитанное из данных */
+    function renderTakeaways() {
+      const put = (id, html) => { const el = $("#" + id); if (el) el.innerHTML = html; };
+      const z = state.z.min;
+      const rival = directRival();
+      const q = state.quality;
+      const qOf = (n) => (q ? q.get(lower(n)) : null);
+      const zQ = qOf("zerdeli app");
+      const kzNames = [...new Set(state.rivals.filter((r) => isKz(r.region)).map((r) => r.company))];
+
+      /* продукт */
+      const helpers = state.rivals.filter((r) => r.liveTeacher || r.mentorAi);
+      const zSubj = String(state.z.subjects || "").split(/[;,]/).filter((x) => x.trim()).length;
+      put("tkProduct", "Мы единственные в подборке даём <b>" + zSubj + " предмета в одной подписке</b>, " +
+        "но и единственные в своей категории <b>без поддержки человека</b>: у " +
+        [...new Set(helpers.map((r) => r.company))].slice(0, 3).join(", ") + " ученику есть кому написать.");
+
+      /* наполнение */
+      if (zQ && Number.isFinite(zQ.tasks)) {
+        const kzTasks = kzNames.map(qOf).filter((x) => x && Number.isFinite(x.tasks));
+        const best = kzTasks.slice().sort((a, b) => b.tasks - a.tasks)[0];
+        if (best) {
+          put("tkContent", "Вопросов у нас больше, чем у любого конкурента в Казахстане: <b>" + nf(zQ.tasks) +
+            "</b> против " + nf(best.tasks) + " у " + esc(best.company) + ".");
+        }
+      }
+
+      /* отзывы */
+      if (typeof REVIEWS !== "undefined" && REVIEWS.stats["Zerdeli App"]) {
+        const st = REVIEWS.stats["Zerdeli App"];
+        const top = Object.entries(st.neg).sort((a, b) => b[1] - a[1])[0];
+        const qal = REVIEWS.stats["Qalan"];
+        const qtop = qal ? Object.entries(qal.neg).sort((a, b) => b[1] - a[1])[0] : null;
+        if (top && top[1]) {
+          put("tkReviews", "Нам жалуются не на учёбу, а на <b>" + lower(top[0]) + "</b> — " +
+            Math.round((top[1] / Math.max(1, st.negTotal)) * 100) + "% всех жалоб." +
+            (qtop ? " У Qalan главная боль другая — " + lower(qtop[0]) + "." : ""));
+        }
+      }
+
+      /* цена */
+      if (rival) {
+        const dearer = state.rivals.filter((r) => r.price > z).length;
+        put("tkPrice", "<b>" + money(z) + " в месяц</b> — дешевле, чем " + dearer + " из " + state.rivals.length +
+          " тарифов рынка, и в <b>" + nf(rival.price / z, 1) + " раза</b> дешевле " + esc(rival.company) + ".");
+      }
+
+      /* охват */
+      if (zQ && Number.isFinite(zQ.instagram)) {
+        const igs = kzNames.map(qOf).filter((x) => x && Number.isFinite(x.instagram));
+        const lead = igs.slice().sort((a, b) => b.instagram - a.instagram)[0];
+        const sameInstalls = kzNames.map(qOf).filter((x) => x && x.installs === zQ.installs && !lower(x.company).includes("zerdeli"));
+        put("tkReach", "Подписчиков у нас в <b>" + nf(lead.instagram / Math.max(1, zQ.instagram), 0) + " раз меньше</b>, чем у " +
+          esc(lead.company) + ", но установок столько же, сколько у " +
+          (sameInstalls.length ? sameInstalls.map((x) => esc(x.company)).join(" и ") : "других местных приложений") +
+          " — при том, что они на рынке с 2015 и 2018 года.");
+      }
     }
 
     function directRival() {
@@ -1581,126 +1636,6 @@
     }
 
     /* ---- 2. Ценовые коридоры категорий: от минимума до максимума + медиана ---- */
-    function renderRangeChart() {
-      const p = palette();
-      const z = state.z.min;
-      const types = TYPE_ORDER.filter((t) => state.rivals.some((r) => r.type === t));
-      const stats = types.map((t) => {
-        const values = state.rivals.filter((r) => r.type === t).map((r) => r.price);
-        return { min: Math.min(...values), max: Math.max(...values), med: median(values), n: values.length };
-      });
-
-      mount("range", "rangeChart", {
-        type: "bar",
-        data: {
-          labels: types.map((t) => t.replace("Приложения для самоучёбы", "Приложения").replace("Курсы и подготовка к ЕНТ", "Курсы и ЕНТ")),
-          datasets: [{
-            data: stats.map((s) => [s.min, s.max]),
-            backgroundColor: types.map((t) => (t === state.z.type ? cssVar("--brand-soft") : cssVar("--rival-soft"))),
-            borderColor: types.map((t) => (t === state.z.type ? p.brand : p.rival2)),
-            borderWidth: 1,
-            borderRadius: 7,
-            barPercentage: 0.5,
-          }],
-        },
-        options: {
-          ...baseOptions(p),
-          indexAxis: "y",
-          plugins: {
-            ...baseOptions(p).plugins,
-            dots: {
-              items: stats.map((s, i) => ({
-                index: i, value: s.med,
-                color: types[i] === state.z.type ? p.brand : p.rival,
-                ring: p.card,
-              })),
-            },
-            guides: { items: [{ axis: "x", value: z, color: p.brand, label: "Зерделі " + money(z) }] },
-            tooltip: {
-              ...baseOptions(p).plugins.tooltip,
-              callbacks: {
-                title: (items) => types[items[0].dataIndex],
-                label: (ctx) => {
-                  const s = stats[ctx.dataIndex];
-                  return ["от " + money(s.min) + " до " + money(s.max), "медиана " + money(s.med), s.n + " " + plural(s.n, "тариф", "тарифа", "тарифов")];
-                },
-              },
-            },
-          },
-          scales: {
-            x: { grid: { color: p.grid }, border: { display: false }, ticks: { color: p.soft, font: { size: 11.5 }, callback: (v) => money(v) } },
-            y: { grid: { display: false }, border: { display: false }, ticks: { color: p.text, font: { size: 12.5, weight: "600" } } },
-          },
-        },
-      });
-    }
-
-    /* ---- 3. Кто даёт столько же функций и сколько за это просит ---- */
-    function renderSameFeatures() {
-      const p = palette();
-      const zRow = state.z.minRow;
-      const zScore = state.z.score;
-      /* у каждой компании берём самый дешёвый тариф, в котором функций не меньше, чем у нас */
-      let rivals = cheapestRows(state.rivals.filter((r) => r.score >= zScore));
-      let note = "Их самый дешёвый тариф, где функций не меньше, чем у Зерделі (" + zScore + " из 5)";
-      if (rivals.length < 3) {
-        rivals = cheapestRows(state.rivals).slice().sort((a, b) => b.score - a.score).slice(0, 8);
-        note = "Компании с самым полным набором функций в текущей выборке";
-      }
-      $("#sameSub").textContent = note + ". Полоса — цена за месяц";
-
-      const rows = (zRow ? rivals.concat([zRow]) : rivals).sort((a, b) => a.price - b.price);
-      if (!rows.length) { if (charts.same) { charts.same.destroy(); delete charts.same; } return; }
-      $("#sameBox").style.height = Math.max(240, rows.length * 34 + 60) + "px";
-      const sameW = $("#sameBox").clientWidth || 600;
-      const narrow = sameW < 520;
-
-      mount("same", "sameChart", {
-        type: "bar",
-        data: {
-          labels: rows.map((r) => (r.isZ ? "Зерделі" : short(r.company, narrow ? 13 : 16)) + (narrow ? "" : " · " + r.score + " " + plural(r.score, "функция", "функции", "функций"))),
-          datasets: [{
-            data: rows.map((r) => r.price),
-            backgroundColor: rows.map((r) => barColor(p, r.isZ, r.region)),
-            borderRadius: 6,
-            barPercentage: 0.62,
-          }],
-        },
-        options: {
-          ...baseOptions(p),
-          indexAxis: "y",
-          layout: { padding: { top: 6, right: 12 } },
-          plugins: {
-            ...baseOptions(p).plugins,
-            guides: { items: [{ axis: "x", value: state.z.min, color: p.brand, label: "Зерделі " + money(state.z.min) }] },
-            tooltip: {
-              ...baseOptions(p).plugins.tooltip,
-              callbacks: {
-                title: (items) => rows[items[0].dataIndex].company,
-                label: (ctx) => {
-                  const r = rows[ctx.dataIndex];
-                  const d = deltaInfo(r.price);
-                  return [money(r.price) + " / мес", priceExplain(r), r.isZ ? "наш тариф" : d.text, "функций: " + r.score + " из 5"];
-                },
-              },
-            },
-          },
-          scales: {
-            x: { grid: { color: p.grid }, border: { display: false }, ticks: { color: p.soft, font: { size: 11.5 }, callback: (v) => money(v) } },
-            y: {
-              grid: { display: false }, border: { display: false },
-              afterFit: (scale) => { scale.width = Math.min(scale.width, sameW * 0.46); },
-              ticks: {
-                color: p.text, autoSkip: false, padding: 2,
-                font: (ctx) => ({ size: 12, weight: rows[ctx.index] && rows[ctx.index].isZ ? "800" : "600" }),
-              },
-            },
-          },
-        },
-      });
-    }
-
-    /* ---- Наполнение и качество: лист Quality, если он заведён ---- */
     function renderQuality() {
       const put = (id, markup) => { const el = $("#" + id); if (el) el.innerHTML = markup; };
       ["tasks", "storesAs", "storesGp", "reachIg", "reachIn", "age"].forEach((k) => {
