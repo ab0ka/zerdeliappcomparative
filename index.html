@@ -198,6 +198,28 @@
     .grid-2.wide-right { grid-template-columns: 1fr 1.18fr; }
     .grid-2.quality-grid { grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr); }
 
+    /* ---------- отзывы ---------- */
+    table.heat th:first-child, table.heat td:first-child { text-align: left; white-space: nowrap; }
+    table.heat th { font-size: 10px; }
+    table.heat td.v { text-align: center; font-weight: 700; font-family: "JetBrains Mono", monospace; font-size: 12px; }
+    table.heat tr.me td:first-child { color: var(--brand); }
+    table.heat tr.thin td { opacity: .55; }
+    .quote-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+    .quote {
+      display: flex; flex-direction: column;
+      padding: 15px 17px; border: 1px solid var(--line); border-left: 3px solid var(--rival-2);
+      border-radius: 12px; background: var(--card); box-shadow: var(--shadow);
+    }
+    .quote.me { border-left-color: var(--brand); background: linear-gradient(180deg, var(--brand-soft), var(--card) 55%); }
+    .quote.bad { border-left-color: var(--hot); }
+    .quote.good { border-left-color: var(--good); }
+    .quote-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
+    .quote-co { font-size: 12.5px; font-weight: 800; }
+    .quote-stars { font-size: 11.5px; letter-spacing: 1px; color: var(--gold); white-space: nowrap; }
+    .quote-text { font-size: 12.5px; line-height: 1.55; }
+    .quote-who { margin-top: 11px; color: var(--soft); font-size: 11px; }
+    .quote-more { grid-column: 1 / -1; margin-top: 2px; }
+
     /* ---------- kpi ---------- */
     .kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     .kpi { border: 1px solid var(--line); border-radius: 14px; background: var(--card); box-shadow: var(--shadow); padding: 15px 16px; }
@@ -306,6 +328,7 @@
       .verdict-grid { grid-template-columns: 1fr; }
       .vs-div { width: auto; height: 1px; }
       .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .quote-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .grid-2, .grid-3, .grid-2.wide-right, .grid-2.quality-grid { grid-template-columns: 1fr; }
       .vs-row { grid-template-columns: 1fr; gap: 10px; }
@@ -315,6 +338,7 @@
       .shell { padding: 16px 14px 48px; }
       h1 { font-size: 20px; }
       .kpis { grid-template-columns: 1fr; }
+      .quote-grid { grid-template-columns: 1fr; }
       .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .vs-price { font-size: 26px; }
       .field .ctl { min-width: 100%; }
@@ -440,6 +464,20 @@
       </div>
       <div id="ratingCards"></div>
 
+      <article class="card" style="margin-top:14px">
+        <div class="card-head">
+          <h3 class="card-title">О чём пишут в отзывах</h3>
+          <div class="card-sub">Доля отзывов компании, где встречается тема. Чем темнее ячейка, тем чаще жалуются. Строки с малым числом отзывов приглушены — проценты там не показательны</div>
+        </div>
+        <div class="table-wrap"><table class="heat" id="reviewThemes"></table></div>
+      </article>
+
+      <div class="sec-head" style="margin-top:22px">
+        <h3 class="card-title" style="font-size:16px">Голоса пользователей</h3>
+        <div class="card-sub">Отзывы из Google Play дословно. Слева фиолетовым — про Зерделі</div>
+      </div>
+      <div class="quote-grid" id="reviewQuotes"></div>
+
       <!-- ШАГ 4. ЦЕНА -->
       <div class="sec-head">
         <div class="sec-kicker">Шаг 4 · Цена</div>
@@ -546,6 +584,10 @@
       ["Mathletics", null, null, null, null, null, "англ", null, null, null, null, "", null, null, 2005, null],
     ];
 
+    /* Отзывы: 229 штук из App Store и Google Play, собраны 13.08.2026.
+       В темах — доля отзывов, где тема упоминается; в цитатах — тексты целиком. */
+    const REVIEWS = {"stats":{"Zerdeli App":{"total":16,"themes":{"Вход и регистрация":3,"Стабильность и баги":2,"Ошибки в заданиях":1,"Поддержка и менторы":0,"Деньги и подписка":0,"Назойливость":0}},"AIPLUS":{"total":2,"themes":{"Вход и регистрация":0,"Стабильность и баги":2,"Ошибки в заданиях":0,"Поддержка и менторы":1,"Деньги и подписка":0,"Назойливость":0}},"Daryn.online":{"total":2,"themes":{"Вход и регистрация":1,"Стабильность и баги":1,"Ошибки в заданиях":0,"Поддержка и менторы":0,"Деньги и подписка":0,"Назойливость":0}},"Qalan":{"total":74,"themes":{"Вход и регистрация":0,"Стабильность и баги":12,"Ошибки в заданиях":6,"Поддержка и менторы":10,"Деньги и подписка":9,"Назойливость":16}},"iTest.kz":{"total":102,"themes":{"Вход и регистрация":16,"Стабильность и баги":15,"Ошибки в заданиях":6,"Поддержка и менторы":1,"Деньги и подписка":11,"Назойливость":0}}},"quotes":[{"c":"Zerdeli App","a":"Karlygash Kanybay","d":"14.09.2025","r":1,"t":"Невозможно внести изменения в название школы, а email одни цифры показывает и невозможно указать буквами почту. Элементарно сведения о себе невозможно достоверно внести в профайл. В общем, доработать!"},{"c":"Zerdeli App","a":"Абдрахман Абилов","d":"05.03.2026","r":1,"t":"Постоянно вылетает из своего аккаунта! Когда пытаюсь зайти, смс код не прилетает!"},{"c":"Zerdeli App","a":"Индира Бердикожа","d":"27.01.2026","r":1,"t":"Сәлеметсіздерме! Тіркелу коды келмейді"},{"c":"Zerdeli App","a":"Zhumat","d":"14.11.2025","r":1,"t":"Глючит жестко, не зайти, 5 смс пришло"},{"c":"Zerdeli App","a":"Сакесов Утеген","d":"22.09.2025","r":1,"t":"Ашылмайды, қара экран көрсетіп тұр"},{"c":"Zerdeli App","a":"Ggg Ggg","d":"17.10.2025","r":2,"t":"В видеоуроках нет полноэкранного режима — для конспектирования это большой минус. И нет перемотки: когда пишешь конспект, нужно двигаться туда-сюда. После обновления изменился дизайн, но если приложение работает неправильно, что толку от красоты?"},{"c":"Zerdeli App","a":"Жако Ханыммм","d":"18.10.2025","r":2,"t":"Участвовал в челлендже, через 3 дня перестал открываться, хотя он должен быть открыт 6 дней. Сделайте!"},{"c":"Zerdeli App","a":"Константин Завьялов","d":"27.06.2026","r":4,"t":"Только для тех, кто учатся в Zerdeli, а так всё что надо есть для учёбы"},{"c":"Zerdeli App","a":"Ерболат Алкеев","d":"08.11.2025","r":5,"t":"Супер приложение для улучшения математики"},{"c":"Zerdeli App","a":"Nurģisa Qadyrbekov","d":"08.11.2025","r":5,"t":"Керемет бағдарлама екен, маған ұнады"},{"c":"Qalan","a":"Gaukhar Kk","d":"06.08.2026","r":1,"t":"Что вы сделали с приложением? Оно становится только хуже. С ментором связаться невозможно: там ИИ, тут автоответчик. Кнопка посмотреть видеообъяснение у ребёнка исчезла. В чат никто не смотрит, на сообщения не отвечает. Не можете исправить — просто верните старую версию"},{"c":"Qalan","a":"Амирлан","d":"22.07.2026","r":1,"t":"Пишу с лица ребёнка. Кураторы названивают каждые 30 минут, не давая покоя. Но не напоминают родителям, когда сделал, и мама часто меня ругает за ничего. Нет никаких выходных, настигает сильное выгорание"},{"c":"Qalan","a":"баур опиаты","d":"27.06.2026","r":1,"t":"Каждый раз названивают, даже в 11 ночи, если не сделал задания. Портит отношения с родителями, само приложение очень неудобное. Синий экран, Qalan бесконечно грузится. Самые пустые 200 тысяч, которые мы потратили"},{"c":"Qalan","a":"Адеми-Ай","d":"14.06.2026","r":1,"t":"Пустая трата денег и времени. Ничего толком не объясняют, при выполнении заданий приходится очень долго ждать. Заплатили 200 000 тенге за обучение, но пользы никакой"},{"c":"Qalan","a":"Інжу Абенғали","d":"22.07.2026","r":1,"t":"Ничему не научилась, всегда выдавал пример из 7 класса или из 9–10, я из 8 класса. Занималась из-за того, что родители оплатили. Уведомление приходит каждые полчаса. У родителей кредит на два года"},{"c":"Qalan","a":"Samsung Tab4","d":"12.07.2026","r":2,"t":"Сначала выглядело многообещающе, а через время очень надоедает: каждый день одно и то же. Видеообъяснения понятно объясняют, но иногда не досказывают. Нет выходных, и ребёнок выгорает"},{"c":"Qalan","a":"Егор Жуков","d":"29.07.2026","r":3,"t":"Обучение проходит нормально, но приложению нужна оптимизация: фото не прикрепить, вечная загрузка. Бывают моменты, когда приложение выдаёт неверный ответ: в объяснении пишет 2, а в ответе стоит 4"},{"c":"Qalan","a":"Озерова Ольга","d":"08.08.2026","r":5,"t":"Пользуемся 55 дней. Из положительного — ежедневные занятия от 10 до 30 минут, напоминания менторов о своевременном решении заданий. Дважды выходила на связь служба контроля качества"},{"c":"Qalan","a":"Aierke Sailau","d":"27.07.2026","r":5,"t":"Отличное приложение для изучения математики. Задания интересные, интерфейс понятный, объяснения помогают разобраться даже в сложных темах"},{"c":"iTest.kz","a":"Sofiya M.","d":"15.05.2025","r":2,"t":"Идея крутая, хороший инструмент для подготовки. НО: я много решала вариантов по физике и химии, и там часто ни один из вариантов ответов неправильный. Проверяю решение через интернет и нейросеть — подтверждают, что правильного ответа нет"},{"c":"iTest.kz","a":"Erin","d":"27.03.2022","r":1,"t":"Очень много ошибок, опечаток, неправильных формулировок, повторяющиеся варианты ответов, недописанные вопросы. Может на проверке выйти не тот ответ, что я выбирала. Часто не показывает картинки к тестам"},{"c":"iTest.kz","a":"Пользователь Google","d":"08.01.2020","r":1,"t":"Главная проблема не только приложения, но и сайта — вечная регистрация или восстановление пароля. Если забыл пароль, наткнёшься на череду бесконечных проблем с подтверждением. И это не первый год, как эту ошибку не исправляют"},{"c":"iTest.kz","a":"Арина Пугачёва","d":"16.10.2024","r":1,"t":"Будьте добры вернуть деньги! Думала, с подпиской станет лучше, в итоге тесты просто не работают. Службе поддержки не написать — нет такой функции, подписку отменить в приложении невозможно"},{"c":"iTest.kz","a":"Фатима Махмуд","d":"31.10.2024","r":2,"t":"Оплатила подписку на 3 месяца. Ничего кроме того, что тесты открылись, не изменилось. Нет больше половины тем по всемирной истории, постоянно вылетаю из тестов, исчезла кнопка работы над ошибками"},{"c":"iTest.kz","a":"not your nuna","d":"01.12.2020","r":4,"t":"Отличное приложение, чтобы готовиться к экзаменам. Но есть ошибки: тест меняет некоторые мои выборы и иногда показывает неправильный результат"},{"c":"AIPLUS","a":"Zharas Muhituly","d":"2026","r":1,"t":"Лагает, постоянно вылетает. Во время тестов вылетает и не грузит, хотя интернет хороший. Когда без приложения было, нам давали значки по баллам, ментор сам говорил, сколько баллов, я дошёл до легенды, а когда приложение выпустили — всё обнулилось"},{"c":"AIPLUS","a":"Bayash","d":"2026","r":2,"t":"Всё обнуляется из-за одного минуса. Раньше, когда было без мобайла, было лучше: я дошла до легенды 2, сейчас всё обнулилось. Приложение часто вылетает"},{"c":"Daryn.online","a":"astbogen","d":"2026","r":1,"t":"Странное приложение, где русский язык? Учитель скинул логин и пароль, скачайте приложение и входите — но как войти по этому паролю, если там самому почту надо вводить"},{"c":"Daryn.online","a":"Nazym Zhappar","d":"2026","r":1,"t":"Вылетает, когда я хочу поменять школу. Я перешла в другую школу ещё 4 года назад, и моей школы в списке нет"}],"themes":["Вход и регистрация","Стабильность и баги","Ошибки в заданиях","Поддержка и менторы","Деньги и подписка","Назойливость"]};
+
     const SHEET_ID = "1Xv4zXp7pMrHMGYP9Fpfccf3h0Yf7dh9AE4Fpa3BGDH4";
     const CSV_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/export?format=csv&gid=0";
     const GVIZ_URL = (sheet) => "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?sheet=" + encodeURIComponent(sheet) + "&tqx=out:json";
@@ -578,6 +620,7 @@
       filters: { query: "", ptype: "", region: "", sortBy: "priceAsc" },
       quality: null,
       showAllRivals: false,
+      showAllQuotes: false,
       qSort: null,
       loadedAt: null,
     };
@@ -933,6 +976,7 @@
     function render() {
       renderVerdict();
       renderProfiles();
+      renderReviews();
       renderKpis();
       renderPriceMap();
       renderRangeChart();
@@ -1048,6 +1092,63 @@
           "<td>" + esc(language(r)) + "</td>" +
           "</tr>"
         )).join("") + "</tbody></table></div></article>";
+    }
+
+    /* Отзывы: тепловая карта тем и лента цитат */
+    function renderReviews() {
+      const heat = $("#reviewThemes"), box = $("#reviewQuotes");
+      if (!heat || !box || typeof REVIEWS === "undefined") return;
+      const p = palette();
+
+      /* --- темы: доля отзывов, где встречается тема --- */
+      const names = Object.keys(REVIEWS.stats).sort((a, b) => REVIEWS.stats[b].total - REVIEWS.stats[a].total);
+      const shares = [];
+      names.forEach((c) => REVIEWS.themes.forEach((t) => {
+        const v = REVIEWS.stats[c].themes[t] || 0;
+        shares.push(v / Math.max(1, REVIEWS.stats[c].total));
+      }));
+      const maxShare = Math.max(0.01, ...shares);
+
+      heat.innerHTML = "<thead><tr><th>Компания</th>" +
+        REVIEWS.themes.map((t) => '<th class="center">' + esc(t) + "</th>").join("") +
+        '<th class="right">Отзывов</th></tr></thead><tbody>' +
+        names.map((c) => {
+          const st = REVIEWS.stats[c];
+          const me = lower(c).includes("zerdeli");
+          return "<tr class=\"" + (me ? "me " : "") + (st.total < 10 ? "thin" : "") + "\"><td><b>" + esc(me ? "Зерделі" : c) + "</b></td>" +
+            REVIEWS.themes.map((t) => {
+              const n = st.themes[t] || 0;
+              const share = n / Math.max(1, st.total);
+              const a = share <= 0 ? 0 : 0.1 + 0.75 * (share / maxShare);
+              const bg = me ? "var(--brand)" : "var(--ink)";
+              return '<td class="v" style="background:color-mix(in srgb, ' + bg + " " + Math.round(a * 100) + '%, transparent);' +
+                (a > 0.45 ? "color:var(--card)" : "") + '" title="' + n + ' из ' + st.total + '">' +
+                (n ? Math.round(share * 100) + "%" : "—") + "</td>";
+            }).join("") +
+            '<td class="right num">' + st.total + "</td></tr>";
+        }).join("") + "</tbody>";
+
+      /* --- цитаты --- */
+      const all = REVIEWS.quotes.slice().sort((a, b) => {
+        const am = lower(a.c).includes("zerdeli") ? 0 : 1, bm = lower(b.c).includes("zerdeli") ? 0 : 1;
+        return am - bm || a.r - b.r;
+      });
+      const limit = state.showAllQuotes ? all.length : 9;
+      box.innerHTML = all.slice(0, limit).map((q) => {
+        const me = lower(q.c).includes("zerdeli");
+        const tone = me ? "me" : (q.r <= 2 ? "bad" : (q.r >= 4 ? "good" : ""));
+        return '<article class="quote ' + tone + '">' +
+          '<div class="quote-top"><span class="quote-co">' + esc(me ? "Зерделі" : q.c) + "</span>" +
+          '<span class="quote-stars">' + "★".repeat(q.r) + '<span style="color:var(--rival-2)">' + "★".repeat(5 - q.r) + "</span></span></div>" +
+          '<div class="quote-text">' + esc(q.t) + "</div>" +
+          '<div class="quote-who">' + esc(q.a) + " · " + esc(q.d) + " · Google Play</div>" +
+          "</article>";
+      }).join("") +
+      (all.length > 9 ? '<button class="btn quote-more" id="moreQuotes" type="button">' +
+        (state.showAllQuotes ? "Свернуть" : "Показать все " + all.length + " отзывов") + "</button>" : "");
+
+      const btn = $("#moreQuotes");
+      if (btn) btn.onclick = () => { state.showAllQuotes = !state.showAllQuotes; renderReviews(); };
     }
 
     function directRival() {
